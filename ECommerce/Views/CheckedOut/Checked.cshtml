@@ -1,0 +1,293 @@
+﻿
+@{
+    ViewBag.Title = "Checked";
+}
+<style>
+    /* General */
+    * {
+        font-family: sans-serif;
+    }
+
+    h1, h2, h3, h4, h5, p {
+        margin: 0;
+    }
+
+    body {
+        background-color: rgb(203, 203, 203);
+    }
+
+    /* Main Container */
+    .main-container {
+        padding: 50px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .check-container {
+        background-color: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.3);
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .wrapper {
+        display: flex;
+        gap: 32px;
+    }
+
+    #product-title {
+        margin-left: 55px;
+    }
+
+    .icon-img {
+        width: 100px;
+    }
+
+    .img-name {
+        align-self: center;
+    }
+
+    .icon-wrap {
+        display: flex;
+        gap: 30px;
+    }
+
+    .product-wrap {
+        display: flex;
+        gap: 80px;
+    }
+
+    .prd-details {
+        align-self: center;
+        gap: 50px;
+    }
+
+    .prd-action {
+        align-self: center;
+        background: none;
+        border: none;
+        color: red;
+    }
+
+    /* Check out section */
+
+    .checkout-section {
+        display: flex;
+        background-color: white;
+        justify-content: space-between;
+        padding: 30px;
+        border-radius: 20px 20px 0 0;
+        position: fixed;
+        bottom: 0;
+        width: 90%;
+    }
+
+    .check-wrap {
+        display: flex;
+        gap: 15px;
+    }
+
+    .check-amount, .total-display {
+        align-self: center;
+    }
+
+    #checkout {
+        background-color: forestgreen;
+        border: none;
+        border-radius: 10px;
+        color: white;
+        padding: 15px;
+        cursor: pointer;
+    }
+
+    .total-display {
+        font-weight: 200;
+        color: forestgreen;
+    }
+
+</style>
+
+<main>
+    <div class="main-container">
+        <div id="check-header" class="check-container">
+            <h3 id="product-title">Products</h3>
+            <div class="wrapper">
+                <h3 class="head-h3">Category</h3>
+                <h3 class="head-h3">Price</h3>
+                <h3 class="head-h3">Quantity</h3>
+                <h3 class="head-h3">Total Price</h3>
+                <h3 class="head-h3">Action</h3>
+            </div>
+        </div>
+
+        <!-- place the product container here -->
+
+        <div class="checkout-section">
+            <div class="check-wrap">
+                <input type="checkbox" class="select-all"/>
+
+                <!-- display this dynamically -->
+                <p class="check-amount">Select All(<span style="font-weight: 500">0</span>)</p>
+                <button class="prd-action" id="cancel">Cancel</button>
+            </div>
+            <div class="check-wrap">
+                <p class="check-amount">Total:</p>
+
+                <!-- Display this dynamically -->
+                <h2 class="total-display">$00.00</h2>
+                <button id="checkout">Checkout</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+
+    // Replace this with the localStorage
+    let products = [
+        { image: "../Content/Garlic.jpg", name: "Garlic", categ: "root", price: 20, quantity: 3 },
+        { image: "../Content/onion.jpg", name: "Onion", categ: "root", price: 20, quantity: 3 },
+        { image: "../Content/bell-pepper.jpg", name: "Bell Pepper", categ: "fruit", price: 35, quantity: 5}
+    ];
+
+    // call the product-checked container
+    let mainContainer = document.querySelector(".main-container");
+    let productChecked = document.getElementById("product-checked");
+
+    products.forEach(pr => {
+
+        // product Container
+        let productChecked = document.createElement("div");
+        productChecked.className = "check-container";
+        productChecked.id = "product-checked";
+
+        // icon wrap
+        let iconWrap = document.createElement("div");
+        iconWrap.className = "icon-wrap";
+
+        let checkOut = document.createElement("input");
+        checkOut.type = "checkbox";
+        checkOut.className = "check-out";
+        checkOut.dataset.index = products.indexOf(pr);
+
+        let iconImg = document.createElement("img");
+        iconImg.className = "icon-img";
+        iconImg.src = pr.image;
+
+        let imgName = document.createElement("h3");
+        imgName.className = "img-name";
+        imgName.textContent = pr.name;
+
+        // Product wrap 
+        let productWrap = document.createElement("div");
+        productWrap.className = "product-wrap";
+
+        let rootDetails = document.createElement("h3");
+        rootDetails.className = "prd-details";
+        rootDetails.textContent = pr.categ;
+
+        let priceDetails = document.createElement("h3");
+        priceDetails.className = "prd-details";
+        priceDetails.textContent = pr.price;
+
+        let qtyDetails = document.createElement("h3");
+        qtyDetails.className = "prd-details";
+        qtyDetails.textContent = pr.quantity;
+
+        let totalDetails = document.createElement("h3");
+        totalDetails.className = "prd-details";
+
+        let totalSol = pr.price * pr.quantity;
+
+        totalDetails.textContent = totalSol;
+
+        let prdAction = document.createElement("button");
+        prdAction.className = "prd-action";
+        prdAction.textContent = "Delete";
+
+        // appending
+        iconWrap.appendChild(checkOut);
+        iconWrap.appendChild(iconImg);
+        iconWrap.appendChild(imgName);
+
+        productWrap.appendChild(rootDetails);
+        productWrap.appendChild(priceDetails);
+        productWrap.appendChild(qtyDetails);
+        productWrap.appendChild(totalDetails);
+        productWrap.appendChild(prdAction);
+
+        productChecked.appendChild(iconWrap);
+        productChecked.appendChild(productWrap);
+
+        mainContainer.appendChild(productChecked);
+
+        // calculate every checked box
+        checkOut.addEventListener("change", () => {
+            updateCheckedCount();
+            totals();
+        });
+
+    });   
+
+    // After creating products
+    let checkboxes = document.querySelectorAll(".check-out");
+    let selectAll = document.querySelector(".select-all");
+    let checkCountDisplay = document.querySelector(".check-amount span");
+
+    // Function to update checked count
+    function updateCheckedCount() {
+        let checkedCount = document.querySelectorAll(".check-out:checked").length;
+        checkCountDisplay.textContent = checkedCount;
+
+        // If all are checked, also check the "select all"
+        selectAll.checked = checkedCount === checkboxes.length;
+    }
+
+    document.getElementById("cancel").addEventListener("click", function () {
+        checkCountDisplay.textContent = 0;
+
+        // uncheck all checkbox
+        checkboxes.forEach(box => {
+            box.checked = false;
+        });
+
+        // Uncheck the select all checkbox too
+        selectAll.checked = false;
+
+        totals();
+    })
+
+    // Add event listener to each product checkbox
+    checkboxes.forEach(box => {
+        box.addEventListener("change", updateCheckedCount);
+    });
+
+    // Select All functionality
+    selectAll.addEventListener("change", function () {
+        checkboxes.forEach(box => {
+            box.checked = selectAll.checked;
+        });
+        updateCheckedCount();
+        totals();
+    });
+
+    function totals() {
+        let checkedBoxes = document.querySelectorAll(".check-out:checked");
+
+        let total = Array.from(checkedBoxes).reduce((sum, box) => {
+            let index = box.dataset.index;
+            let product = products[index];
+            return sum + (product.price * product.quantity);
+        }, 0);
+
+        document.querySelector(".total-display").textContent = `$${total}.00`;
+    }
+
+    // Initialize count on load
+    updateCheckedCount();
+
+</script>
+

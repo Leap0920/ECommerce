@@ -1,0 +1,732 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<style>
+    /* general */
+    h1, h2, p, h3, h4, h5 {
+        margin: 0;
+    }
+
+    input, button {
+        border: none;
+    }
+
+    main {
+        margin: 30px;
+    }
+
+    .search-div {
+        padding: 10px 0;
+        width: 100%;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        position: sticky;
+        top: 90px;
+        z-index: 10;
+        background-color: white;
+    }
+
+    .wrap-search {
+        width: 100%;
+        display: flex;
+        gap: 0px;
+        justify-content:center;
+    }
+
+    #search-bar, #search-btn {
+        background-color: lightgray;
+        padding: 5px;
+    }
+
+    #search-btn {
+        width: 50px;
+        border-radius: 0 15px 15px 0;
+    }
+
+    #search-icon {
+        width: 20px;
+    }
+
+    #search-bar {
+        width: 60%;
+        border-radius: 15px 0 0 15px;
+        padding-left: 15px;
+    }
+
+    /* Green background */
+    .green-bg {
+        background-image: url(/Content/green-bg.png);
+        width: 100%;
+        height: 100vh;
+        z-index: -2;
+    }
+
+    .black-tint {
+        width: 100%;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.3);
+        z-index: -1;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+    }
+
+    .motto {
+        padding: 100px;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    #smol {
+        font-weight: 100;
+        letter-spacing: 5px;
+        font-size: 60px;
+    }
+
+    #bold {
+        font-weight: bold;
+        font-size: 70px;
+    }
+
+    #desc {
+        font-size: 20px;
+        line-height: 25px;
+    }
+
+    .buy-now {
+        width: 100px;
+        height: 50px;
+        border-radius: 20px;
+        background-color: forestgreen;
+        color: white;
+        font-weight: bold;
+        margin-top: 50px;
+        cursor: pointer;
+        transition: ease 0.3s;
+        font-size: 15px;
+    }
+
+    .buy-now:hover{
+        background-color: white;
+        color: forestgreen;
+        transition: ease 0.3s;
+    }
+
+    .process {
+       position: relative;
+       margin: 50px;
+       display: flex;
+       width: 90%;
+       justify-content: space-between;
+    }
+
+    .cart-img {
+        width: 120px;
+        height: 120px;
+    }
+
+    .wrap-hr {
+        z-index: -1;
+        display: flex;
+        position: absolute;
+        width: 100%;
+        top: 50px;
+    }
+
+    hr {
+        border: solid 2px black;
+        width: 86%;
+    }
+
+    #cart-part {
+        display: flex;
+    }
+
+    .process-text {
+        color: forestgreen;
+    }
+
+    #add-part {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #chck-part {
+        display: flex;
+    }
+
+    /* Product Section Navigation */
+    #product-section-nav {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .filter-vege {
+        color: forestgreen;
+        width: 140px;
+    }
+
+    .navi-title, .drop-title {
+        color: forestgreen;
+    }
+
+    /* Products */
+    .main-grid {
+        display: grid;
+        margin: 50px;
+        grid-template-rows: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
+        gap: 30px;
+    }
+
+    .veg-contain {
+        border: 1px solid grey;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 10px;
+        gap: 50px;
+        border-radius: 5px;
+    }
+
+    .product-icon {
+        width: 170px;
+    }
+
+    .product-details-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .prod-name {
+        font-size: 20px;
+    }
+
+    .prod-price {
+        color: forestgreen;
+    }
+
+    .action-contain {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-action {
+        background-color: darkgrey;
+        border-radius: 20px;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+    }
+
+    .icon-btn {
+        width: 30px;
+        height: 30px;
+    }
+
+    /* Modal (updated) */
+    .popup-container {
+       background-color: rgba(0,0,0,0.7);
+       position: fixed;
+       left: 0;
+       top: 0;
+       width: 100%;
+       height: 100vh;
+       display: flex;
+       justify-content: center;
+       align-items: center;
+       z-index: 9999;
+    }
+
+    .product-view {
+        background: linear-gradient(to bottom, #8daa63, #f2f2f2);
+        padding: 20px;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        justify-content: center;
+        align-items: center;
+        width: 40%;
+    }
+
+    .popup-icon {
+        width: 100%;
+    }
+
+    .description-container {
+        margin: 10px;
+        display: flex;
+        gap: 15px;
+    }
+
+    .left-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        align-self: center;
+    }
+
+    .wrap-left {
+        display: flex;
+        gap: 10px;
+    }
+
+    .popup-product-name, .popup-product-price {
+        font-weight: 100;
+    }
+
+    .popup-product-name {
+        font-size: 40px;
+    }
+
+    .popup-product-price {
+        color: forestgreen;
+        align-self: center;
+        font-size: 25px;
+    }
+
+    .qty-text {
+        font-size: 30px;
+        font-weight: 200;
+    }
+
+    .qty-btn, .qty-amount-display {
+        align-self: center;
+        border-radius: 5px;
+        font-size: 25px;
+    }
+
+    .qty-btn {
+        cursor: pointer;
+    }
+
+    .qty-amount-display {
+        background-color: white;
+        padding: 0px 5px;
+    }
+
+    .action-btn {
+        font-weight: 600;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 10px;
+        gap: 5px;
+        border: solid 2px grey;
+        cursor: pointer;
+    }
+
+    .right-container {
+        background-color: darkgray;
+        line-height: 20px;
+        padding: 10px;
+        border: 2px solid grey;
+        border-radius: 15px;
+    }
+
+    /* check container */
+    .check-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999999;
+    }
+
+    .checked-out {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        background-color: rgba(0,0,0,0.7);
+        padding: 10px;
+        border-radius: 15px;
+    }
+
+    #check-icon {
+        width: 100px;
+    }
+
+    .added-text {
+        font-weight: 300;
+        color: white;
+    }
+
+</style>
+    <!-- search bar -->
+    <div class="search-div">
+        <div class="wrap-search">
+            <input type="text" id="search-bar" placeholder="search product"/>
+            <button id="search-btn">
+                <img id="search-icon" src="~/Content/search.png"/>
+            </button>
+        </div>
+    </div>
+    <div class="green-bg">
+    <!-- place the green bg here -->
+        <div class="black-tint">
+            <div class="motto">
+                <h1 id="smol">Fresh & Healthy</h1>
+                <h1 id="bold">Organic Vegetables</h1>
+                <p id="desc">Our store offers always and quality vegetables,<br />Buy from a wide rannge of high quality organic vegetables.</p>
+                <button class="buy-now">Buy now</button>
+            </div>
+        </div>
+    </div>
+    <div class="process">
+        <div class="wrap-hr">
+            <hr />
+        </div>
+        <div id="cart-part">
+            <img src="~/Content/cartOrange.png" class="cart-img"/>
+            <h4 class="process-text">Select Product</h4>
+        </div>
+        <div id="add-part">
+            <img src="~/Content/cartAdd.png" class="cart-img" />
+            <h4 class="process-text">Add to Cart</h4>
+        </div>
+        <div id="chck-part">
+            <h4 class="process-text">Checkout</h4>
+            <img src="~/Content/chck.png" class="cart-img" />
+        </div>
+    </div>
+
+    <main>
+        <div id="product-section-nav">
+            <h2 class="navi-title">Products</h2>
+            <div class="wrap">
+                <h4 class="drop-title">
+                    Category:
+                </h4>
+                <select class="filter-vege">
+                    <option>All</option>
+                    <option value="leafy">Leafy Vegetables</option>
+                    <option value="root">Root Vegetables</option>
+                    <option value="fruit">Fruit Vegetables</option>
+                </select>
+            </div>
+        </div>
+        <div class="main-grid">
+            <!-- display the products here -->
+        </div>
+    </main>
+
+<!-- modal for products (updated) -->
+<div class="popup-container" style="display: none">
+    <div class="product-view">
+       <!-- display the clicked product here -->
+    </div>
+</div>
+
+<!-- checkout popup -->
+<div class="check-container" style="display: none">
+    <div class="checked-out">
+       <img src="~/Content/checked.png" id="check-icon"/>
+        <h3 class="added-text">Item has been added to your cart</h3>
+    </div>
+</div>
+
+<script type="module">
+
+    // fetches the products
+    let res = await fetch("../Content/vegs.json");
+    let data = await res.json();
+
+    let mainGrid = document.querySelector(".main-grid");
+
+    // displays all the json file
+    displayer(data);
+
+    // search-bar function
+    let searchBar = document.getElementById("search-bar");
+
+    document.querySelector("#search-btn").addEventListener("click", function () {
+
+        // clear the main grid
+        mainGrid.innerHTML = "";
+
+        let searchVal = searchBar.value.toLowerCase();
+
+        let filtered = data.filter(d => d.name.toLowerCase().includes(searchVal));
+
+        displayer(filtered);
+    })
+
+    // modal container called
+    let popupCont = document.querySelector(".popup-container");
+
+    // added to cart notif
+    let chckContainer = document.querySelector(".check-container");
+
+    // initial container for the checked out products (for local storage/Backend)
+    let checkProducts = [];
+
+    let filterVege = document.querySelector(".filter-vege");
+
+    filterVege.addEventListener("change", function () {
+        let val = this.value;
+        mainGrid.innerHTML = "";
+
+        if (val === "leafy") {
+            let leaf = data.filter(d => d.type === "leafy");
+            displayer(leaf);
+        } else if (val === "root") {
+            let root = data.filter(d => d.type === "root");
+            displayer(root);
+        } else if (val === "fruit") {
+            let fruit = data.filter(d => d.type === "fruit");
+            displayer(fruit);
+        } else {
+            displayer(data);
+        }
+    })
+
+    // displays the data from the json 
+    function displayer(dat) {
+        dat.forEach(dt => {
+            let vegContain = document.createElement("div");
+            vegContain.className = "veg-contain";
+
+            let prodIcon = document.createElement("img");
+            prodIcon.className = "product-icon";
+            prodIcon.src = dt.image;
+
+            let actionContain = document.createElement("div");
+            actionContain.className = "action-contain";
+
+            let btnAddAction = document.createElement("button");
+            btnAddAction.className = "btn-action";
+            btnAddAction.id = "add";
+
+            let iconBtn = document.createElement("img");
+            iconBtn.className = "icon-btn";
+            iconBtn.src = "../Content/cart-btn-icon.png";
+
+            btnAddAction.appendChild(iconBtn);
+
+            let prodDetailsWrap = document.createElement("div");
+            prodDetailsWrap.className = "product-details-wrap";
+
+            let prodName = document.createElement("p");
+            prodName.className = "prod-name";
+            prodName.textContent = dt.name;
+
+            let prodPrice = document.createElement("p");
+            prodPrice.className = "prod-price";
+            prodPrice.textContent = `$ ${dt.price}`;
+
+            prodDetailsWrap.appendChild(prodName);
+            prodDetailsWrap.appendChild(prodPrice);
+
+            let btnFavAction = document.createElement("button");
+            btnFavAction.className = "btn-action";
+            btnFavAction.id = "to-fav";
+
+            let iconFavBtn = document.createElement("img");
+            iconFavBtn.src = "../Content/fav-btn-icon.png";
+            iconFavBtn.className = "icon-btn";
+
+            btnFavAction.appendChild(iconFavBtn);
+
+            actionContain.appendChild(btnAddAction);
+            actionContain.appendChild(prodDetailsWrap);
+            actionContain.appendChild(btnFavAction);
+
+            vegContain.appendChild(prodIcon);
+            vegContain.appendChild(actionContain);
+
+            mainGrid.appendChild(vegContain);
+
+            // when clicking a product
+            vegContain.addEventListener("click", function(e) {
+
+                if (!e.target.closest(".btn-action")) {
+                    popupCont.style.display = "flex";
+                    modalCreation(dt.image, dt.name, dt.description, dt.price);
+                }
+
+            })  
+
+            btnAddAction.addEventListener("click", function () {
+                checkedNotif();
+                pushItem(dt.name, dt.price, 1);
+                console.log(checkProducts);
+            });
+
+        })
+    }
+
+    popupCont.addEventListener("click", (e) => {
+        if (e.target === popupCont) {
+            popupCont.style.display = "none"
+        }
+    });
+
+    // modal when clicking a product (updated)
+    function modalCreation(prodIcon, prodName, prodDesc, prodPrc) {
+
+        let productView = document.querySelector(".product-view");
+
+        // clears previous product
+        productView.innerHTML = "";
+
+        // creates container for product icon
+        let iconContainer = document.createElement("div");
+        iconContainer.className = "icon-container"
+
+        // product icon
+        let popupIcon = document.createElement("img");
+        popupIcon.className = "popup-icon";
+        popupIcon.src = prodIcon; // img parameter
+
+        // create mini container for left/right container
+        let descContainer = document.createElement("div");
+        descContainer.className = "description-container";
+
+        // create left/right container
+        let leftContainer = document.createElement("div");
+        leftContainer.className = "left-container";
+
+        let rightContainer = document.createElement("div");
+        rightContainer.className = "right-container";
+
+        // wrapper for left contents
+        let wrapTopLeft = document.createElement("div");
+        wrapTopLeft.className = "wrap-left";
+
+        let wrapMidLeft = document.createElement("div");
+        wrapMidLeft.className = "wrap-left";
+
+        let wrapLowLeft = document.createElement("div");
+        wrapLowLeft.className = "wrap-left";
+
+        // details - Top left
+        let prdName = document.createElement("h2");
+        prdName.className = "popup-product-name";
+        prdName.textContent = prodName; // name parameter
+
+        let pdPrice = document.createElement("h4");
+        pdPrice.className = "popup-product-price";
+        pdPrice.textContent = `$${prodPrc}.00` // price parameter
+
+        // details - Mid left
+        let qtyText = document.createElement("h5");
+        qtyText.className = "qty-text";
+        qtyText.textContent = "Quantity: ";
+
+        let qtyMinBtn = document.createElement("button");
+        qtyMinBtn.className = "qty-btn";
+        qtyMinBtn.id = "minus";
+        qtyMinBtn.textContent = "-";
+
+        let qtyAmount = document.createElement("p");
+        qtyAmount.className = "qty-amount-display";
+        qtyAmount.textContent = "1";
+
+        let qtyAddBtn = document.createElement("button");
+        qtyAddBtn.className = "qty-btn";
+        qtyAddBtn.id = "plus";
+        qtyAddBtn.textContent = "+";
+
+        // details - Lower left
+        let toCartBtn = document.createElement("button");
+        toCartBtn.className = "action-btn";
+        toCartBtn.id = "cart-btn";
+        toCartBtn.textContent = "Add to cart";
+
+        let toCartIcon = document.createElement("img"); // append this
+        toCartIcon.src = "../Content/green-btn-cart.png";
+        toCartBtn.appendChild(toCartIcon);
+
+        let toCheckBtn = document.createElement("button");
+        toCheckBtn.className = "action-btn";
+        toCheckBtn.id = "check-out";
+        toCheckBtn.textContent = "Check out"
+
+        let toCheckIcon = document.createElement("img"); // append this
+        toCheckIcon.src = "../Content/green-btn-check.png"
+        toCheckBtn.appendChild(toCheckIcon);
+
+        // Right Contents
+        rightContainer.textContent = prodDesc; // desc parameter
+
+        // append left contents
+        wrapTopLeft.appendChild(prdName);
+        wrapTopLeft.appendChild(pdPrice);
+
+        wrapMidLeft.appendChild(qtyText);
+        wrapMidLeft.appendChild(qtyMinBtn);
+        wrapMidLeft.appendChild(qtyAmount);
+        wrapMidLeft.appendChild(qtyAddBtn);
+
+        wrapLowLeft.appendChild(toCartBtn);
+        wrapLowLeft.appendChild(toCheckBtn);
+
+        leftContainer.appendChild(wrapTopLeft);
+        leftContainer.appendChild(wrapMidLeft);
+        leftContainer.appendChild(wrapLowLeft);
+
+        // append contents
+        descContainer.appendChild(leftContainer);
+        descContainer.appendChild(rightContainer);
+
+        iconContainer.appendChild(popupIcon);
+
+        productView.appendChild(iconContainer);
+        productView.appendChild(descContainer);
+
+        // Add/minus button
+        let temp = 1
+
+        wrapMidLeft.addEventListener("click", function(e) {
+            let action = e.target.id;
+
+            if (action === "minus" && temp > 1) {
+                temp -= 1;
+            } else if (action === "plus") {
+                temp += 1;
+            } 
+
+            qtyAmount.textContent = temp;
+
+        })
+
+        toCartBtn.addEventListener("click", () => {
+            pushItem(prodName, prodPrc, temp);
+            console.log(checkProducts);
+            checkedNotif();
+        });
+    }
+
+    // when adding a product to cart
+    function checkedNotif() {
+        chckContainer.style.display = "flex";
+        setTimeout(() => {
+            chckContainer.style.display = "none";
+        }, 4000);
+    }
+
+    // pushing a product
+    function pushItem(pName, pPrice, pStck) {
+        let injector = {
+            name: pName,
+            price: pPrice,
+            amount: pStck
+        }
+
+        checkProducts.push(injector);
+    }
+</script>

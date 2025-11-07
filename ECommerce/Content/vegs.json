@@ -1,0 +1,93 @@
+[
+  {
+    "id": 1,
+    "name": "Tomato",
+    "price": 45,
+    "image": "/Content/tomato-new.jpg",
+    "description": "Fresh red tomatoes rich in vitamin C and perfect for salads, sauces, and soups.",
+    "favorite": false,
+    "type": "fruit"
+  },
+  {
+    "id": 2,
+    "name": "Carrot",
+    "price": 60,
+    "image": "/Content/carrots.jpg",
+    "description": "Crunchy and sweet carrots full of beta-carotene, great for snacks and stews.",
+    "favorite": false,
+    "type": "root"
+  },
+  {
+    "id": 3,
+    "name": "Broccoli",
+    "price": 120,
+    "image": "/Content/brocolli.jpg",
+    "description": "Organic broccoli florets packed with fiber and antioxidants.",
+    "favorite": false,
+    "type": "leafy"
+  },
+  {
+    "id": 4,
+    "name": "Cabbage",
+    "price": 35,
+    "image": "/Content/Cabbage.jpg",
+    "description": "Crisp green cabbage ideal for stir-fries, soups, and salads.",
+    "favorite": false,
+    "type": "leafy"
+  },
+  {
+    "id": 5,
+    "name": "Potato",
+    "price": 55,
+    "image": "/Content/potato.jpg",
+    "description": "Golden potatoes perfect for baking, mashing, or frying.",
+    "favorite": false,
+    "type": "root"
+  },
+  {
+    "id": 6,
+    "name": "Eggplant",
+    "price": 70,
+    "image": "/Content/eggplant.jpeg",
+    "description": "Glossy purple eggplants with a tender texture and rich flavor.",
+    "favorite": false,
+    "type": "fruit"
+  },
+  {
+    "id": 7,
+    "name": "Spinach",
+    "price": 40,
+    "image": "/Content/spinach.jpg",
+    "description": "Leafy green spinach full of iron, vitamins, and freshness.",
+    "favorite": false,
+    "type": "leafy"
+  },
+  {
+    "id": 8,
+    "name": "Bell Pepper",
+    "price": 90,
+    "image": "/Content/bell-pepper.jpg",
+    "description": "Colorful bell peppers (red, yellow, and green) with a sweet crisp taste.",
+    "favorite": false,
+    "type": "fruit"
+  },
+  {
+    "id": 9,
+    "name": "Onion",
+    "price": 50,
+    "image": "/Content/onion.jpg",
+    "description": "Aromatic onions to enhance the flavor of your everyday dishes.",
+    "favorite": false,
+    "type": "root"
+  },
+  {
+    "id": 10,
+    "name": "Garlic",
+    "price": 80,
+    "image": "/Content/Garlic.jpg",
+    "description": "Fresh garlic bulbs known for their aroma and health benefits.",
+    "favorite": false,
+    "type": "root"
+  }
+]
+
