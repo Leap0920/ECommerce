@@ -9,5 +9,11 @@ namespace ECommerce.Controllers
         {
             return View();
         }
+
+        // GET: Customer list (for admin)
+        public ActionResult Index()
+        {
+            return View();
+        }
     }
 }

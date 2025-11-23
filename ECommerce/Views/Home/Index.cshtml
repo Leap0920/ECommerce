@@ -245,6 +245,10 @@
         }
         
         localStorage.setItem("checkedProducts", JSON.stringify(checkedProducts));
+        
+        // Dispatch custom event to update cart badge
+        window.dispatchEvent(new Event('cartUpdated'));
+        
         showCartModal();
     }
 

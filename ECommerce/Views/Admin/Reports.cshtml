@@ -1,0 +1,120 @@
+@{
+    ViewBag.Title = "Reports";
+}
+
+<div style="display: flex; gap: 2rem;">
+    <!-- Sidebar -->
+    <aside style="width: 250px; flex-shrink: 0;">
+        <div class="card" style="padding: 1.5rem; position: sticky; top: 100px;">
+            <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Menu</h3>
+            <ul style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <li>
+                    <a href="@Url.Action("Index", "Admin")" class="btn btn-outline" style="width: 100%; justify-content: start; gap: 0.75rem; border: none;">
+                        <i class="ph-bold ph-squares-four"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Products", "Admin")" class="btn btn-outline" style="width: 100%; justify-content: start; gap: 0.75rem; border: none;">
+                        <i class="ph-bold ph-package"></i> Products
+                    </a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Orders", "Admin")" class="btn btn-outline" style="width: 100%; justify-content: start; gap: 0.75rem; border: none;">
+                        <i class="ph-bold ph-shopping-cart"></i> Orders
+                    </a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Reports", "Admin")" class="btn btn-primary" style="width: 100%; justify-content: start; gap: 0.75rem;">
+                        <i class="ph-bold ph-chart-line"></i> Reports
+                    </a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Index", "Customer")" class="btn btn-outline" style="width: 100%; justify-content: start; gap: 0.75rem; border: none;">
+                        <i class="ph-bold ph-users"></i> Customers
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div style="flex: 1;">
+        <h1 style="font-size: 2rem; margin-bottom: 2rem;">Sales Reports</h1>
+
+        <!-- Period Selector -->
+        <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <span style="font-weight: 600;">Period:</span>
+                <button class="btn btn-primary" style="font-size: 0.875rem; padding: 0.5rem 1rem;">Last 7 Days</button>
+                <button class="btn btn-outline" style="font-size: 0.875rem; padding: 0.5rem 1rem;">Last 30 Days</button>
+                <button class="btn btn-outline" style="font-size: 0.875rem; padding: 0.5rem 1rem;">Last Year</button>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+            <div class="card" style="padding: 1.5rem;">
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Total Revenue</p>
+                <h2 style="font-size: 2rem; color: var(--primary); margin-bottom: 0.25rem;">$12,450</h2>
+                <span style="color: var(--success); font-size: 0.875rem; font-weight: 600;">↑ 12% from last period</span>
+            </div>
+            <div class="card" style="padding: 1.5rem;">
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Orders</p>
+                <h2 style="font-size: 2rem; color: var(--primary); margin-bottom: 0.25rem;">450</h2>
+                <span style="color: var(--success); font-size: 0.875rem; font-weight: 600;">↑ 5% from last period</span>
+            </div>
+            <div class="card" style="padding: 1.5rem;">
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Avg Order Value</p>
+                <h2 style="font-size: 2rem; color: var(--primary); margin-bottom: 0.25rem;">$27.67</h2>
+                <span style="color: var(--warning); font-size: 0.875rem; font-weight: 600;">↓ 2% from last period</span>
+            </div>
+        </div>
+
+        <!-- Sales Chart Placeholder -->
+        <div class="card" style="padding: 2rem; margin-bottom: 2rem;">
+            <h3 style="margin-bottom: 1.5rem;">Sales Trend</h3>
+            <div style="height: 300px; background: var(--bg-alt); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+                <div style="text-align: center;">
+                    <i class="ph-bold ph-chart-line" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <p>Chart visualization placeholder</p>
+                    <p style="font-size: 0.875rem;">Integrate Chart.js or similar library for real charts</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Products -->
+        <div class="card" style="padding: 1.5rem;">
+            <h3 style="margin-bottom: 1.5rem;">Top Selling Products</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--border); text-align: left;">
+                        <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Product</th>
+                        <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Sales</th>
+                        <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Revenue</th>
+                        <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Trend</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 1rem 0; font-weight: 600;">Organic Tomatoes</td>
+                        <td style="padding: 1rem 0;">245 units</td>
+                        <td style="padding: 1rem 0;">$1,225</td>
+                        <td style="padding: 1rem 0;"><span style="color: var(--success);">↑ 15%</span></td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 1rem 0; font-weight: 600;">Fresh Carrots</td>
+                        <td style="padding: 1rem 0;">198 units</td>
+                        <td style="padding: 1rem 0;">$495</td>
+                        <td style="padding: 1rem 0;"><span style="color: var(--success);">↑ 8%</span></td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 1rem 0; font-weight: 600;">Green Spinach</td>
+                        <td style="padding: 1rem 0;">156 units</td>
+                        <td style="padding: 1rem 0;">$468</td>
+                        <td style="padding: 1rem 0;"><span style="color: var(--error);">↓ 3%</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
