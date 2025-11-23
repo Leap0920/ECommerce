@@ -1,0 +1,141 @@
+@{
+    ViewBag.Title = "Customers";
+}
+
+<div style="display: flex; gap: 2rem;">
+    <!-- Sidebar -->
+    <aside style="width: 250px; flex-shrink: 0;">
+        <div class="card" style="padding: 1.5rem; position: sticky; top: 100px;">
+            <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Menu</h3>
+            <ul style="display: flex; flex-direction: column; gap: 0.5rem;">
+                <li>
+                    <a href="@Url.Action("Index", "Admin")" class="btn btn-outline" style="width: 100%; justify-content: start; gap: 0.75rem; border: none;">
+                        <i class="ph-bold ph-squares-four"></i> Dashboard
+                    </a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Products", "Admin")" class="btn btn-outline" style="width: 100%; justify-content: start; gap: 0.75rem; border: none;">
+                        <i class="ph-bold ph-package"></i> Products
+                    </a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Orders", "Admin")" class="btn btn-outline" style="width: 100%; justify-content: start; gap: 0.75rem; border: none;">
+                        <i class="ph-bold ph-shopping-cart"></i> Orders
+                    </a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Reports", "Admin")" class="btn btn-outline" style="width: 100%; justify-content: start; gap: 0.75rem; border: none;">
+                        <i class="ph-bold ph-chart-line"></i> Reports
+                    </a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Index", "Customer")" class="btn btn-primary" style="width: 100%; justify-content: start; gap: 0.75rem;">
+                        <i class="ph-bold ph-users"></i> Customers
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div style="flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">Customers</h1>
+                <p>Manage customer accounts</p>
+            </div>
+            <button class="btn btn-primary">
+                <i class="ph-bold ph-plus" style="margin-right: 0.5rem;"></i> Add Customer
+            </button>
+        </div>
+
+        <div class="card" style="padding: 1.5rem;">
+            <div style="margin-bottom: 1.5rem;">
+                <div class="form-group" style="margin: 0; max-width: 300px;">
+                    <div style="position: relative;">
+                        <input type="text" class="form-control" placeholder="Search customers..." style="padding-left: 2.5rem;">
+                        <i class="ph ph-magnifying-glass" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    </div>
+                </div>
+            </div>
+
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--border); text-align: left;">
+                        <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Customer</th>
+                        <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Email</th>
+                        <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Orders</th>
+                        <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Total Spent</th>
+                        <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Status</th>
+                        <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500; text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 1rem 0;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">JD</div>
+                                <div>
+                                    <div style="font-weight: 600;">John Doe</div>
+                                    <div style="font-size: 0.875rem; color: var(--text-muted);">Member since 2023</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 1rem 0;">john.doe@example.com</td>
+                        <td style="padding: 1rem 0;">24</td>
+                        <td style="padding: 1rem 0; font-weight: 600;">$1,245</td>
+                        <td style="padding: 1rem 0;">
+                            <span style="background: #dcfce7; color: #166534; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.85rem; font-weight: 500;">Active</span>
+                        </td>
+                        <td style="padding: 1rem 0; text-align: right;">
+                            <button class="icon-btn"><i class="ph-bold ph-eye"></i></button>
+                            <button class="icon-btn"><i class="ph-bold ph-pencil-simple"></i></button>
+                        </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 1rem 0;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">JS</div>
+                                <div>
+                                    <div style="font-weight: 600;">Jane Smith</div>
+                                    <div style="font-size: 0.875rem; color: var(--text-muted);">Member since 2023</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 1rem 0;">jane.smith@example.com</td>
+                        <td style="padding: 1rem 0;">18</td>
+                        <td style="padding: 1rem 0; font-weight: 600;">$890</td>
+                        <td style="padding: 1rem 0;">
+                            <span style="background: #dcfce7; color: #166534; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.85rem; font-weight: 500;">Active</span>
+                        </td>
+                        <td style="padding: 1rem 0; text-align: right;">
+                            <button class="icon-btn"><i class="ph-bold ph-eye"></i></button>
+                            <button class="icon-btn"><i class="ph-bold ph-pencil-simple"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 1rem 0;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), var(--accent)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">MJ</div>
+                                <div>
+                                    <div style="font-weight: 600;">Mike Johnson</div>
+                                    <div style="font-size: 0.875rem; color: var(--text-muted);">Member since 2023</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="padding: 1rem 0;">mike.j@example.com</td>
+                        <td style="padding: 1rem 0;">12</td>
+                        <td style="padding: 1rem 0; font-weight: 600;">$675</td>
+                        <td style="padding: 1rem 0;">
+                            <span style="background: #fef3c7; color: #92400e; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.85rem; font-weight: 500;">Inactive</span>
+                        </td>
+                        <td style="padding: 1rem 0; text-align: right;">
+                            <button class="icon-btn"><i class="ph-bold ph-eye"></i></button>
+                            <button class="icon-btn"><i class="ph-bold ph-pencil-simple"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
