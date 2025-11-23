@@ -14,7 +14,8 @@
     @Scripts.Render("~/bundles/modernizr")
     
     <!-- Icons (Phosphor Icons for modern look) -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    @{ var phosphorUrl = "https://unpkg.com/@phosphor-icons/web"; }
+    <script src="@phosphorUrl"></script>
 </head>
 <body>
     <!-- Modern Navbar -->
@@ -29,7 +30,7 @@
             <!-- Navigation Links -->
             <ul class="nav-links">
                 <li><a href="@Url.Action("Index", "Home")" class="nav-link @(ViewBag.Title == "Home Page" ? "active" : "")">Home</a></li>
-                <li><a href="#" class="nav-link">Shop</a></li>
+                <li><a href="@Url.Action("Index", "Home")#products" class="nav-link">Shop</a></li>
                 <li><a href="#" class="nav-link">About</a></li>
                 
                 <!-- Admin Link (Visible for demo) -->

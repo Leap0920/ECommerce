@@ -1,0 +1,98 @@
+@{
+    ViewBag.Title = "My Orders";
+}
+
+<div class="section" style="max-width: 1000px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1 style="font-size: 2rem;">My Orders</h1>
+        <div class="form-group" style="margin: 0;">
+            <select class="form-control">
+                <option>All Orders</option>
+                <option>Last 30 Days</option>
+                <option>2023</option>
+            </select>
+        </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <!-- Order Card 1 -->
+        <div class="card" style="padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1rem;">
+                <div style="display: flex; gap: 2rem;">
+                    <div>
+                        <p style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem;">Order Placed</p>
+                        <span style="font-weight: 600;">October 24, 2023</span>
+                    </div>
+                    <div>
+                        <p style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem;">Total</p>
+                        <span style="font-weight: 600;">$120.50</span>
+                    </div>
+                    <div>
+                        <p style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem;">Ship To</p>
+                        <span style="font-weight: 600; color: var(--primary);">John Doe</span>
+                    </div>
+                </div>
+                <div>
+                    <p style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem; text-align: right;">Order # 112-3456789</p>
+                    <div style="display: flex; gap: 1rem;">
+                        <a href="#" style="color: var(--primary); font-weight: 500;">View Invoice</a>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; gap: 1.5rem; align-items: center;">
+                    <div style="position: relative;">
+                        <img src="~/Content/Images/Products/basket-full.png" onerror="this.src='https://placehold.co/100x100'" style="width: 80px; height: 80px; object-fit: contain;">
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Organic Vegetable Bundle</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Sold by: FreshMarket Inc.</p>
+                        <span style="background: #dcfce7; color: #166534; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.85rem; font-weight: 600;">Delivered Oct 26</span>
+                    </div>
+                </div>
+                <button class="btn btn-primary">Buy Again</button>
+            </div>
+        </div>
+
+        <!-- Order Card 2 -->
+        <div class="card" style="padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1rem;">
+                <div style="display: flex; gap: 2rem;">
+                    <div>
+                        <p style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem;">Order Placed</p>
+                        <span style="font-weight: 600;">September 15, 2023</span>
+                    </div>
+                    <div>
+                        <p style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem;">Total</p>
+                        <span style="font-weight: 600;">$45.00</span>
+                    </div>
+                    <div>
+                        <p style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem;">Ship To</p>
+                        <span style="font-weight: 600; color: var(--primary);">John Doe</span>
+                    </div>
+                </div>
+                <div>
+                    <p style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem; text-align: right;">Order # 112-9876543</p>
+                    <div style="display: flex; gap: 1rem;">
+                        <a href="#" style="color: var(--primary); font-weight: 500;">View Invoice</a>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; gap: 1.5rem; align-items: center;">
+                    <div style="position: relative;">
+                        <img src="~/Content/Images/Products/tomato-new.jpg" onerror="this.src='https://placehold.co/100x100'" style="width: 80px; height: 80px; object-fit: contain;">
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">Fresh Organic Tomatoes (5kg)</h3>
+                        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Sold by: FreshMarket Inc.</p>
+                        <span style="background: #dcfce7; color: #166534; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.85rem; font-weight: 600;">Delivered Sep 17</span>
+                    </div>
+                </div>
+                <button class="btn btn-outline">Write a Review</button>
+            </div>
+        </div>
+    </div>
+</div>
