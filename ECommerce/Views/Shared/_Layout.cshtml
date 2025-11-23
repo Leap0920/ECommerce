@@ -1,98 +1,109 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
-    <style>
-        /* General */
-        * {
-            font-family: "Poppins", sans-serif;
-        }
-
-        body{ 
-            margin: 0px;
-        }
-
-        .main-wrap {
-            display: flex;
-            gap: 40px;
-        }
-
-        /* nav bar */
-        nav {
-            background-color: white;
-            display: flex;
-            justify-content: space-between;
-            padding: 15px 50px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .logo {
-            width: 100px;
-        }
-
-        .wrap {
-            display: flex;
-            gap: 10px;
-            align-self: center;
-        }
-
-        .panel-link, .regis-link, .view-action {
-            color: limegreen;
-            cursor: pointer;
-        }
-
-        .panel-link {
-            font-weight: 400;
-            font-size: 20px;
-            text-decoration: none;
-        }
-
-        .panel-link:hover {
-            text-decoration: underline;
-            transition: ease 0.5s;
-        }
-
-        .regis-link {
-            border: 1px solid grey;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 15px;
-            padding: 10px;
-            transition: ease 0.5s;
-        }
-
-        .regis-link:hover {
-            color: white;
-            background-color: forestgreen;
-            transition: ease 0.5s;
-        }
-    </style>
+    <title>@ViewBag.Title - FreshMarket</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    
+    <!-- Icons (Phosphor Icons for modern look) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
-    <nav>
-        <img class="logo" alt="logo" src="~/Content/logo.png"/> 
-        <div class="main-wrap">
-            <div class="wrap">
-                <h2 class="panel-link" id="home">@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "panel-link" })</h2>
-            </div>
-            <div class="wrap">
-                <a href="@Url.Action("Checked", "CheckedOut")">
-                    <img class="view-action" id="cart" src="~/Content/cart.png" />
+    <!-- Modern Navbar -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <!-- Logo -->
+            <a href="@Url.Action("Index", "Home")" class="nav-logo">
+                <i class="ph-fill ph-plant"></i>
+                <span>FreshMarket</span>
+            </a>
+
+            <!-- Navigation Links -->
+            <ul class="nav-links">
+                <li><a href="@Url.Action("Index", "Home")" class="nav-link @(ViewBag.Title == "Home Page" ? "active" : "")">Home</a></li>
+                <li><a href="#" class="nav-link">Shop</a></li>
+                <li><a href="#" class="nav-link">About</a></li>
+                
+                <!-- Admin Link (Visible for demo) -->
+                <li><a href="@Url.Action("Index", "Admin")" class="nav-link">Admin</a></li>
+            </ul>
+
+            <!-- Actions -->
+            <div class="nav-actions">
+                <a href="#" class="icon-btn">
+                    <i class="ph ph-magnifying-glass" style="font-size: 1.25rem;"></i>
                 </a>
-            </div>
-            <div class="wrap">
-                <h4 id="sign-in">@Html.ActionLink("Sign In", "SignIn", "Regis", new { area = "" }, new { @class = "regis-link" })</h4>
-                <h4 id="regis">@Html.ActionLink("Register", "Register", "Regis", new { area = "" }, new { @class = "regis-link" })</h4>
+                
+                <a href="@Url.Action("Index", "Cart")" class="icon-btn">
+                    <i class="ph ph-shopping-cart" style="font-size: 1.25rem;"></i>
+                    <span class="badge">3</span>
+                </a>
+
+                <!-- Auth Buttons -->
+                <div style="margin-left: 1rem; display: flex; gap: 0.5rem;">
+                    <a href="@Url.Action("SignIn", "Regis")" class="btn btn-outline" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Sign In</a>
+                    <a href="@Url.Action("Register", "Regis")" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Register</a>
+                </div>
             </div>
         </div>
     </nav>
 
-    @RenderBody()
+    <!-- Main Content -->
+    <div class="container body-content animate-fade-in">
+        @RenderBody()
+    </div>
+
+    <!-- Modern Footer -->
+    <footer style="background: white; border-top: 1px solid var(--border); margin-top: 4rem; padding: 4rem 0;">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
+                <div>
+                    <div class="nav-logo" style="margin-bottom: 1rem;">
+                        <i class="ph-fill ph-plant"></i>
+                        <span>FreshMarket</span>
+                    </div>
+                    <p style="font-size: 0.9rem;">Delivering fresh, organic produce directly from local farmers to your doorstep.</p>
+                </div>
+                <div>
+                    <h4>Shop</h4>
+                    <ul style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                        <li><a href="#" class="nav-link">Vegetables</a></li>
+                        <li><a href="#" class="nav-link">Fruits</a></li>
+                        <li><a href="#" class="nav-link">Organic Bundles</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Company</h4>
+                    <ul style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                        <li><a href="#" class="nav-link">About Us</a></li>
+                        <li><a href="#" class="nav-link">Contact</a></li>
+                        <li><a href="#" class="nav-link">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Newsletter</h4>
+                    <div style="margin-top: 1rem; display: flex; gap: 0.5rem;">
+                        <input type="email" placeholder="Enter your email" class="form-control">
+                        <button class="btn btn-primary"><i class="ph-bold ph-paper-plane-right"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 0.9rem;">
+                &copy; @DateTime.Now.Year - FreshMarket E-Commerce. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
 </body>
 </html>
