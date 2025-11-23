@@ -471,8 +471,8 @@
     // added to cart notif
     let chckContainer = document.querySelector(".check-container");
 
-    // initial container for the checked out products (for local storage/Backend)
-    let checkProducts = [];
+    // local storage for checked products (REPLACE WITH BACKEND)
+    let checkedProducts = JSON.parse(localStorage.getItem("checkedProducts")) || [];
 
     let filterVege = document.querySelector(".filter-vege");
 
@@ -555,15 +555,15 @@
 
                 if (!e.target.closest(".btn-action")) {
                     popupCont.style.display = "flex";
-                    modalCreation(dt.image, dt.name, dt.description, dt.price);
+                    modalCreation(dt.image, dt.name, dt.description, dt.price, dt.type);
                 }
 
             })  
 
             btnAddAction.addEventListener("click", function () {
                 checkedNotif();
-                pushItem(dt.name, dt.price, 1);
-                console.log(checkProducts);
+                pushItem(dt.image, dt.name, dt.price, 1, dt.price, dt.type);
+                console.log(checkedProducts);
             });
 
         })
@@ -576,7 +576,7 @@
     });
 
     // modal when clicking a product (updated)
-    function modalCreation(prodIcon, prodName, prodDesc, prodPrc) {
+    function modalCreation(prodIcon, prodName, prodDesc, prodPrc, typu) {
 
         let productView = document.querySelector(".product-view");
 
@@ -705,8 +705,8 @@
         })
 
         toCartBtn.addEventListener("click", () => {
-            pushItem(prodName, prodPrc, temp);
-            console.log(checkProducts);
+            pushItem(prodIcon, prodName, prodPrc, temp, prodPrc * temp, typu);
+            console.log(checkedProducts);
             checkedNotif();
         });
     }
@@ -720,13 +720,29 @@
     }
 
     // pushing a product
-    function pushItem(pName, pPrice, pStck) {
+    function pushItem(icons, pName, pPrice, pStck, totes, typ) {
+
+        // Always get the latest version
+        let current = JSON.parse(localStorage.getItem("checkedProducts")) || [];
+
         let injector = {
+            img: icons,
             name: pName,
             price: pPrice,
-            amount: pStck
+            amount: pStck,
+            totalPrice: totes,
+            type: typ
         }
 
-        checkProducts.push(injector);
+        current.push(injector);
+
+        if (checkedProducts.length > 0) {
+            console.log("success");
+        }
+
+        localStorage.setItem("checkedProducts", JSON.stringify(current));
+
+        checkedProducts = current;
     }
+
 </script>

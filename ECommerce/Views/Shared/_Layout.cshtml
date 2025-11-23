@@ -79,10 +79,8 @@
         <div class="main-wrap">
             <div class="wrap">
                 <h2 class="panel-link" id="home">@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "panel-link" })</h2>
-                <h2 class="panel-link" id="products">Products</h2>
             </div>
             <div class="wrap">
-                <img class="view-action" id="fav" src="~/Content/fav.png" />
                 <a href="@Url.Action("Checked", "CheckedOut")">
                     <img class="view-action" id="cart" src="~/Content/cart.png" />
                 </a>
