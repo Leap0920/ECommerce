@@ -3,5 +3,58 @@
     ViewBag.Title = "Register";
 }
 
-<h2>Register</h2>
+<div style="min-height: 80vh; display: flex; align-items: center; justify-content: center;">
+    <div class="card animate-fade-in" style="width: 100%; max-width: 500px; padding: 3rem;">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="width: 60px; height: 60px; background: var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: var(--primary);">
+                <i class="ph-fill ph-user-plus" style="font-size: 1.5rem;"></i>
+            </div>
+            <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;">Create Account</h1>
+            <p>Join us to get fresh produce delivered daily</p>
+        </div>
+
+        <form>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label">First Name</label>
+                    <input type="text" class="form-control" placeholder="John">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" class="form-control" placeholder="Doe">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <div style="position: relative;">
+                    <input type="email" class="form-control" placeholder="name@example.com" style="padding-left: 2.5rem;">
+                    <i class="ph ph-envelope" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <div style="position: relative;">
+                    <input type="password" class="form-control" placeholder="Create a password" style="padding-left: 2.5rem;">
+                    <i class="ph ph-lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Confirm Password</label>
+                <div style="position: relative;">
+                    <input type="password" class="form-control" placeholder="Confirm your password" style="padding-left: 2.5rem;">
+                    <i class="ph ph-lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Create Account</button>
+        </form>
+
+        <div style="margin-top: 2rem; text-align: center; font-size: 0.9rem; color: var(--text-muted);">
+            Already have an account? <a href="@Url.Action("SignIn", "Regis")" style="color: var(--primary); font-weight: 600;">Sign in</a>
+        </div>
+    </div>
+</div>
 

@@ -17,14 +17,14 @@
     }
 
     /* Main Container */
-    .main-container {
-        padding: 50px;
+    .main-container, .product-container {
+        padding: 20px;
         display: flex;
         flex-direction: column;
         gap: 15px;
     }
 
-    .check-container {
+    .check-container, .product-checked {
         background-color: white;
         padding: 25px;
         border-radius: 15px;
@@ -82,6 +82,7 @@
         border-radius: 20px 20px 0 0;
         position: fixed;
         bottom: 0;
+        left: 20px;
         width: 90%;
     }
 
@@ -108,6 +109,66 @@
         color: forestgreen;
     }
 
+    /* check container */
+    .checkers {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999999;
+        background-color: rgba(0,0,0,0.4);
+    }
+
+    .checked-out {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        background-color: rgba(0,0,0,0.7);
+        padding: 10px;
+        border-radius: 15px;
+        width: 40%;
+    }
+
+    #check-icon {
+        width: 100px;
+    }
+
+    .added-text {
+        font-weight: 300;
+        color: white;
+    }
+
+    /* Deletion Modal */
+    .delete-modal {
+        background-color: white;
+        border-radius: 15px;
+        padding: 25px;
+        width: 40%;
+        height: 30%;
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+        justify-content: center;
+        align-content: center;
+    }
+
+    .btn-wrap {
+        display: flex;
+        justify-content: space-around;
+        gap: 20px;
+    }
+
+    .btn-action {
+        border: none;
+        padding: 10px;
+        border-radius: 10px;
+        width: 30%;
+    }
 </style>
 
 <main>
@@ -122,115 +183,155 @@
                 <h3 class="head-h3">Action</h3>
             </div>
         </div>
+    </div>
 
+    <div class="product-container">
         <!-- place the product container here -->
-
-        <div class="checkout-section">
-            <div class="check-wrap">
-                <input type="checkbox" class="select-all"/>
-
-                <!-- display this dynamically -->
-                <p class="check-amount">Select All(<span style="font-weight: 500">0</span>)</p>
-                <button class="prd-action" id="cancel">Cancel</button>
-            </div>
-            <div class="check-wrap">
-                <p class="check-amount">Total:</p>
-
-                <!-- Display this dynamically -->
-                <h2 class="total-display">$00.00</h2>
-                <button id="checkout">Checkout</button>
-            </div>
-        </div>
     </div>
 </main>
+
+<div class="checkout-section">
+    <div class="check-wrap">
+        <input type="checkbox" class="select-all" />
+
+        <!-- display this dynamically -->
+        <p class="check-amount">Select All(<span style="font-weight: 500">0</span>)</p>
+        <button class="prd-action" id="cancel">Cancel</button>
+    </div>
+    <div class="check-wrap">
+        <p class="check-amount">Total:</p>
+
+        <!-- Display this dynamically -->
+        <h2 class="total-display">$00.00</h2>
+        <button id="checkout">Checkout</button>
+    </div>
+</div>
+
+<!-- Check-container -->
+<div class="checkers" style="display: none">
+    <div class="checked-out">
+        <img src="~/Content/Images/UI/checked.png" id="check-icon" />
+        <h3 class="added-text">Checked out</h3>
+    </div>
+</div>
+
+<!-- delete product confirmation -->
+<div class="checkers" id="deletion-modal" style="display:none">
+    <div class="delete-modal">
+        <h2 class="delete-text">Are you sure you want to delete this product?</h2>
+        <div class="btn-wrap">
+            <button class="btn-action" id="not-delete">no</button>
+            <button class="btn-action" id="confirm-delete">yes</button>
+        </div>
+    </div>
+</div>
+
+<style>
+
+</style>
 
 <script>
 
     // Replace this with the localStorage
-    let products = [
-        { image: "../Content/Garlic.jpg", name: "Garlic", categ: "root", price: 20, quantity: 3 },
-        { image: "../Content/onion.jpg", name: "Onion", categ: "root", price: 20, quantity: 3 },
-        { image: "../Content/bell-pepper.jpg", name: "Bell Pepper", categ: "fruit", price: 35, quantity: 5}
-    ];
+    let checkedProducts = JSON.parse(localStorage.getItem("checkedProducts")) || [];
 
     // call the product-checked container
     let mainContainer = document.querySelector(".main-container");
     let productChecked = document.getElementById("product-checked");
+    let productContainer = document.querySelector(".product-container");
 
-    products.forEach(pr => {
+    // deletion modal
+    let deletionModal = document.getElementById("deletion-modal");
 
-        // product Container
-        let productChecked = document.createElement("div");
-        productChecked.className = "check-container";
-        productChecked.id = "product-checked";
+    productDisplay(checkedProducts);
 
-        // icon wrap
-        let iconWrap = document.createElement("div");
-        iconWrap.className = "icon-wrap";
+    function productDisplay(prod) {
+        productContainer.innerHTML = "";
+        prod.forEach((pr, i) => {
+            // product Container
+            let productChecked = document.createElement("div");
+            productChecked.classList.add("check-container", "product-checked");
 
-        let checkOut = document.createElement("input");
-        checkOut.type = "checkbox";
-        checkOut.className = "check-out";
-        checkOut.dataset.index = products.indexOf(pr);
+            // icon wrap
+            let iconWrap = document.createElement("div");
+            iconWrap.className = "icon-wrap";
 
-        let iconImg = document.createElement("img");
-        iconImg.className = "icon-img";
-        iconImg.src = pr.image;
+            let checkOut = document.createElement("input");
+            checkOut.type = "checkbox";
+            checkOut.className = "check-out";
+            checkOut.dataset.index = i
 
-        let imgName = document.createElement("h3");
-        imgName.className = "img-name";
-        imgName.textContent = pr.name;
+            let iconImg = document.createElement("img");
+            iconImg.className = "icon-img";
+            iconImg.src = pr.img;
 
-        // Product wrap 
-        let productWrap = document.createElement("div");
-        productWrap.className = "product-wrap";
+            let imgName = document.createElement("h3");
+            imgName.className = "img-name";
+            imgName.textContent = pr.name;
 
-        let rootDetails = document.createElement("h3");
-        rootDetails.className = "prd-details";
-        rootDetails.textContent = pr.categ;
+            // Product wrap
+            let productWrap = document.createElement("div");
+            productWrap.className = "product-wrap";
 
-        let priceDetails = document.createElement("h3");
-        priceDetails.className = "prd-details";
-        priceDetails.textContent = pr.price;
+            let rootDetails = document.createElement("h3");
+            rootDetails.className = "prd-details";
+            rootDetails.textContent = pr.type;
 
-        let qtyDetails = document.createElement("h3");
-        qtyDetails.className = "prd-details";
-        qtyDetails.textContent = pr.quantity;
+            let priceDetails = document.createElement("h3");
+            priceDetails.className = "prd-details";
+            priceDetails.textContent = pr.price;
 
-        let totalDetails = document.createElement("h3");
-        totalDetails.className = "prd-details";
+            let qtyDetails = document.createElement("h3");
+            qtyDetails.className = "prd-details";
+            qtyDetails.textContent = pr.amount;
 
-        let totalSol = pr.price * pr.quantity;
+            let totalDetails = document.createElement("h3");
+            totalDetails.className = "prd-details";
 
-        totalDetails.textContent = totalSol;
+             totalDetails.textContent = pr.totalPrice;
 
-        let prdAction = document.createElement("button");
-        prdAction.className = "prd-action";
-        prdAction.textContent = "Delete";
+            let prdAction = document.createElement("button");
+            prdAction.className = "prd-action";
+            prdAction.textContent = "Delete";
 
-        // appending
-        iconWrap.appendChild(checkOut);
-        iconWrap.appendChild(iconImg);
-        iconWrap.appendChild(imgName);
+            // appending
+            iconWrap.appendChild(checkOut);
+            iconWrap.appendChild(iconImg);
+            iconWrap.appendChild(imgName);
 
-        productWrap.appendChild(rootDetails);
-        productWrap.appendChild(priceDetails);
-        productWrap.appendChild(qtyDetails);
-        productWrap.appendChild(totalDetails);
-        productWrap.appendChild(prdAction);
+            productWrap.appendChild(rootDetails);
+            productWrap.appendChild(priceDetails);
+            productWrap.appendChild(qtyDetails);
+            productWrap.appendChild(totalDetails);
+            productWrap.appendChild(prdAction);
 
-        productChecked.appendChild(iconWrap);
-        productChecked.appendChild(productWrap);
+            productChecked.appendChild(iconWrap);
+            productChecked.appendChild(productWrap);
 
-        mainContainer.appendChild(productChecked);
+            productContainer.appendChild(productChecked);
 
-        // calculate every checked box
-        checkOut.addEventListener("change", () => {
-            updateCheckedCount();
-            totals();
+            // calculate every checked box
+            checkOut.addEventListener("change", () => {
+                updateCheckedCount();
+                totals();
+            });
+
+            // delete listener
+            prdAction.addEventListener("click", () => {
+                deletionModal.style.display = "flex";
+
+                // one-time click for modal buttons
+                deletionModal.onclick = (e) => {
+                    if (e.target.id === "confirm-delete") {
+                        deletionModal.style.display = "none";
+                        deleteItem(i);
+                    } else if (e.target.id === "not-delete") {
+                        deletionModal.style.display = "none";
+                    }
+                };
+            });
         });
-
-    });   
+    }
 
     // After creating products
     let checkboxes = document.querySelectorAll(".check-out");
@@ -239,6 +340,7 @@
 
     // Function to update checked count
     function updateCheckedCount() {
+        let checkboxes = document.querySelectorAll(".check-out");
         let checkedCount = document.querySelectorAll(".check-out:checked").length;
         checkCountDisplay.textContent = checkedCount;
 
@@ -247,6 +349,7 @@
     }
 
     document.getElementById("cancel").addEventListener("click", function () {
+        let checkboxes = document.querySelectorAll(".check-out");
         checkCountDisplay.textContent = 0;
 
         // uncheck all checkbox
@@ -267,6 +370,7 @@
 
     // Select All functionality
     selectAll.addEventListener("change", function () {
+        let checkboxes = document.querySelectorAll(".check-out");
         checkboxes.forEach(box => {
             box.checked = selectAll.checked;
         });
@@ -276,18 +380,61 @@
 
     function totals() {
         let checkedBoxes = document.querySelectorAll(".check-out:checked");
+        let totalDisplay = document.querySelector(".total-display");
 
-        let total = Array.from(checkedBoxes).reduce((sum, box) => {
-            let index = box.dataset.index;
-            let product = products[index];
-            return sum + (product.price * product.quantity);
+        let total = Array.from(checkedBoxes).reduce((acc, box) => {
+            let index = Number(box.dataset.index);
+            let item = checkedProducts[index];
+            if (!item) return acc; // skip if undefined
+            return acc + Number(item.totalPrice || item.price || 0);
         }, 0);
 
-        document.querySelector(".total-display").textContent = `$${total}.00`;
+        totalDisplay.textContent = `$${total.toFixed(2)}`;
     }
 
     // Initialize count on load
     updateCheckedCount();
+
+    document.getElementById("checkout").addEventListener("click", function () {
+        checkoutAction();
+    })
+
+    function checkoutAction() {
+        let checkedBoxes = document.querySelectorAll(".check-out:checked");
+        let checkAmount = document.querySelector(".check-amount span");
+        let checkers = document.querySelector(".checkers");
+
+        // remove checked items
+        checkedProducts = checkedProducts.filter((_, i) =>
+            !Array.from(checkedBoxes).some(box => Number(box.dataset.index) === i)
+        );
+
+        localStorage.setItem("checkedProducts", JSON.stringify(checkedProducts));
+        productDisplay(checkedProducts);
+        updateCheckedCount();
+        totals();
+
+        checkers.style.display = "flex";
+        setTimeout(() => {
+            checkers.style.display = "none";
+        }, 2000); 
+        
+        checkAmount.textContent = 0;
+        document.querySelector(".total-display").textContent = "$00.00";
+        document.querySelector(".select-all").checked = false;
+
+    }
+
+    // deletion function
+    function deleteItem(index) {
+        checkedProducts.splice(index, 1);
+
+        localStorage.setItem("checkedProducts", JSON.stringify(checkedProducts));
+
+        productDisplay(checkedProducts);
+        updateCheckedCount();
+        totals();
+    }
 
 </script>
 
