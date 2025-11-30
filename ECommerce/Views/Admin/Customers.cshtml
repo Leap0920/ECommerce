@@ -1,0 +1,90 @@
+@{
+    ViewBag.Title = "Manage Customers";
+}
+
+<div style="display: flex; gap: 2rem;">
+    <!-- Sidebar -->
+    @Html.Partial("_AdminSidebar")
+
+    <!-- Main Content -->
+    <div style="flex: 1;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h1 style="font-size: 2rem; margin-bottom: 0.5rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Customers</h1>
+                <p style="color: var(--text-muted);">Manage customer accounts</p>
+            </div>
+        </div>
+
+        <div class="card" style="padding: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem;">
+                <div class="form-group" style="margin: 0; width: 300px;">
+                    <div style="position: relative;">
+                        <input type="text" class="form-control" placeholder="Search customers..." style="padding-left: 2.5rem;" id="customer-search">
+                        <i class="ph ph-magnifying-glass" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                    </div>
+                </div>
+            </div>
+
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--border); text-align: left;">
+                        <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Customer</th>
+                        <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Email</th>
+                        <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Orders</th>
+                        <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Total Spent</th>
+                        <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500; text-align: right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="customers-body">
+                    <tr>
+                        <td colspan="5" style="padding: 3rem; text-align: center; color: var(--text-muted);">No customers found.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // This would typically fetch from server, but for now showing placeholder
+    const tbody = document.getElementById("customers-body");
+    
+    // Placeholder - in real app, this would come from server
+    const customers = [];
+    
+    function renderCustomers() {
+        if (customers.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="padding: 3rem; text-align: center; color: var(--text-muted);">No customers found.</td></tr>`;
+            return;
+        }
+        
+        tbody.innerHTML = "";
+        customers.forEach(customer => {
+            const tr = document.createElement("tr");
+            tr.style.borderBottom = "1px solid var(--border)";
+            tr.innerHTML = `
+                <td style="padding: 1rem 0;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        <div style="width: 40px; height: 40px; background: #e5e7eb; border-radius: 50%;"></div>
+                        <span style="font-weight: 600;">${customer.name}</span>
+                    </div>
+                </td>
+                <td style="padding: 1rem 0;">${customer.email}</td>
+                <td style="padding: 1rem 0;">${customer.orderCount || 0}</td>
+                <td style="padding: 1rem 0; font-weight: 600;">$${customer.totalSpent || 0}.00</td>
+                <td style="padding: 1rem 0; text-align: right;">
+                    <button class="icon-btn"><i class="ph-bold ph-eye"></i></button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+    
+    renderCustomers();
+    
+    // Search functionality
+    document.getElementById("customer-search").addEventListener("input", function(e) {
+        // Search logic would go here
+    });
+</script>
+

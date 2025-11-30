@@ -54,7 +54,7 @@
                 </div>
             </div>
 
-            <a href="@Url.Action("Checkout", "Cart")" class="btn btn-primary" style="width: 100%; justify-content: center;">
+            <a href="@Url.Action("Checkout", "Cart")" class="btn btn-primary vue-btn" style="width: 100%; justify-content: center;" data-vue-btn="cart-checkout">
                 Proceed to Checkout <i class="ph-bold ph-arrow-right" style="margin-left: 0.5rem;"></i>
             </a>
             
@@ -114,7 +114,7 @@
                     <button class="icon-btn" onclick="updateQty(${index}, 1)" style="width: 30px; height: 30px; font-size: 0.8rem;">+</button>
                 </div>
                 <div style="font-weight: 700; color: var(--primary);">$${item.totalPrice}</div>
-                <button class="icon-btn" onclick="removeItem(${index})" style="color: #ef4444;">
+                <button class="icon-btn vue-btn" onclick="removeItem(${index})" style="color: #ef4444;" data-vue-btn="cart-remove-${index}">
                     <i class="ph-bold ph-trash"></i>
                 </button>
             `;
