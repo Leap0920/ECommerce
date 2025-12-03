@@ -1,0 +1,39 @@
+@{
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+}
+
+<aside style="width: 250px; flex-shrink: 0;">
+    <div class="card" style="padding: 1.5rem; position: sticky; top: 100px; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(45, 106, 79, 0.1); position: relative; overflow: hidden;">
+        <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-primary);"></div>
+        <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Menu</h3>
+        <ul style="display: flex; flex-direction: column; gap: 0.5rem; list-style: none; padding: 0; margin: 0;">
+            <li>
+                <a href="@Url.Action("Index", "Admin")" class="btn @(currentAction == "Index" && currentController == "Admin" ? "btn-primary" : "btn-outline")" style="width: 100%; justify-content: start; gap: 0.75rem; @(currentAction == "Index" && currentController == "Admin" ? "" : "border: none;")">
+                    <i class="ph-bold ph-squares-four"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="@Url.Action("Products", "Admin")" class="btn @(currentAction == "Products" && currentController == "Admin" ? "btn-primary" : "btn-outline")" style="width: 100%; justify-content: start; gap: 0.75rem; @(currentAction == "Products" && currentController == "Admin" ? "" : "border: none;")">
+                    <i class="ph-bold ph-package"></i> Products
+                </a>
+            </li>
+            <li>
+                <a href="@Url.Action("Orders", "Admin")" class="btn @(currentAction == "Orders" && currentController == "Admin" ? "btn-primary" : "btn-outline")" style="width: 100%; justify-content: start; gap: 0.75rem; @(currentAction == "Orders" && currentController == "Admin" ? "" : "border: none;")">
+                    <i class="ph-bold ph-shopping-cart"></i> Orders
+                </a>
+            </li>
+            <li>
+                <a href="@Url.Action("Reports", "Admin")" class="btn @(currentAction == "Reports" && currentController == "Admin" ? "btn-primary" : "btn-outline")" style="width: 100%; justify-content: start; gap: 0.75rem; @(currentAction == "Reports" && currentController == "Admin" ? "" : "border: none;")">
+                    <i class="ph-bold ph-chart-line"></i> Reports
+                </a>
+            </li>
+            <li>
+                <a href="@Url.Action("Customers", "Admin")" class="btn @((currentAction == "Customers" && currentController == "Admin") || (currentAction == "Index" && currentController == "Customer") ? "btn-primary" : "btn-outline")" style="width: 100%; justify-content: start; gap: 0.75rem; @((currentAction == "Customers" && currentController == "Admin") || (currentAction == "Index" && currentController == "Customer") ? "" : "border: none;")">
+                    <i class="ph-bold ph-users"></i> Customers
+                </a>
+            </li>
+        </ul>
+    </div>
+</aside>
+

@@ -4,116 +4,85 @@
 
 <div style="display: flex; gap: 2rem;">
     <!-- Sidebar -->
-    <aside style="width: 250px; flex-shrink: 0;">
-        <div class="card" style="padding: 1.5rem; position: sticky; top: 100px;">
-            <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Menu</h3>
-            <ul style="display: flex; flex-direction: column; gap: 0.5rem;">
-                <li>
-                    <a href="@Url.Action("Index", "Admin")" class="btn btn-primary" style="width: 100%; justify-content: start; gap: 0.75rem;">
-                        <i class="ph-bold ph-squares-four"></i> Dashboard
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="btn btn-outline" style="width: 100%; justify-content: start; gap: 0.75rem; border: none;">
-                        <i class="ph-bold ph-package"></i> Products
-                    </a>
-                </li>
-                <li>
-                    <a href="@Url.Action("Orders", "Admin")" class="btn btn-outline" style="width: 100%; justify-content: start; gap: 0.75rem; border: none;">
-                        <i class="ph-bold ph-shopping-cart"></i> Orders
-                    </a>
-                </li>
-                <li>
-                    <a href="@Url.Action("Reports", "Admin")" class="btn btn-outline" style="width: 100%; justify-content: start; gap: 0.75rem; border: none;">
-                        <i class="ph-bold ph-chart-line"></i> Reports
-                    </a>
-                </li>
-                <li>
-                    <a href="@Url.Action("Index", "Customer")" class="btn btn-outline" style="width: 100%; justify-content: start; gap: 0.75rem; border: none;">
-                        <i class="ph-bold ph-users"></i> Customers
-                    </a>
-                </li>
-                <li>
-                    <a href="#" class="btn btn-outline" style="width: 100%; justify-content: start; gap: 0.75rem; border: none;">
-                        <i class="ph-bold ph-chart-line-up"></i> Reports
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </aside>
+    @Html.Partial("_AdminSidebar")
 
     <!-- Main Content -->
     <div style="flex: 1; display: flex; flex-direction: column; gap: 2rem;">
         <!-- Header -->
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
-                <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">Dashboard</h1>
-                <p>Welcome back, Admin</p>
+                <h1 style="font-size: 2rem; margin-bottom: 0.5rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Dashboard</h1>
+                <p style="color: var(--text-muted);">Welcome back, Admin</p>
             </div>
             <button class="btn btn-primary">
                 <i class="ph-bold ph-plus" style="margin-right: 0.5rem;"></i> Add Product
             </button>
         </div>
 
-        <!-- Stats Grid -->
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;">
-            <div class="card" style="padding: 1.5rem;">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                    <div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.25rem;">Total Sales</p>
-                        <h3 id="stat-sales" style="font-size: 1.75rem;">$0.00</h3>
+            <!-- Stats Grid -->
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem;">
+                <div class="card" style="padding: 1.5rem; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border: 1px solid var(--border); position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-primary);"></div>
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div>
+                            <p style="font-size: 0.9rem; margin-bottom: 0.25rem; color: var(--text-muted);">Total Sales</p>
+                            <h3 id="stat-sales" style="font-size: 1.75rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">$0.00</h3>
+                        </div>
+                        <div style="padding: 0.75rem; background: var(--gradient-light); border-radius: 50%; box-shadow: 0 4px 15px rgba(45, 106, 79, 0.2);">
+                            <i class="ph-bold ph-currency-dollar" style="color: var(--primary); font-size: 1.25rem;"></i>
+                        </div>
                     </div>
-                    <div style="padding: 0.5rem; background: #dcfce7; color: #166534; border-radius: 50%;">
-                        <i class="ph-bold ph-currency-dollar"></i>
-                    </div>
+                    <span style="color: var(--primary); font-size: 0.85rem; font-weight: 600;">+12% from last month</span>
                 </div>
-                <span style="color: #166534; font-size: 0.85rem; font-weight: 600;">+12% from last month</span>
-            </div>
-            
-            <div class="card" style="padding: 1.5rem;">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                    <div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.25rem;">Total Orders</p>
-                        <h3 id="stat-orders" style="font-size: 1.75rem;">0</h3>
+                
+                <div class="card" style="padding: 1.5rem; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border: 1px solid var(--border); position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);"></div>
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div>
+                            <p style="font-size: 0.9rem; margin-bottom: 0.25rem; color: var(--text-muted);">Total Orders</p>
+                            <h3 id="stat-orders" style="font-size: 1.75rem; color: #2563eb;">0</h3>
+                        </div>
+                        <div style="padding: 0.75rem; background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border-radius: 50%; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);">
+                            <i class="ph-bold ph-shopping-bag" style="color: #2563eb; font-size: 1.25rem;"></i>
+                        </div>
                     </div>
-                    <div style="padding: 0.5rem; background: #dbeafe; color: #1e40af; border-radius: 50%;">
-                        <i class="ph-bold ph-shopping-bag"></i>
-                    </div>
+                    <span style="color: #2563eb; font-size: 0.85rem; font-weight: 600;">+5% from last month</span>
                 </div>
-                <span style="color: #1e40af; font-size: 0.85rem; font-weight: 600;">+5% from last month</span>
-            </div>
 
-            <div class="card" style="padding: 1.5rem;">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                    <div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.25rem;">Products</p>
-                        <h3 id="stat-products" style="font-size: 1.75rem;">0</h3>
+                <div class="card" style="padding: 1.5rem; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border: 1px solid var(--border); position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);"></div>
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div>
+                            <p style="font-size: 0.9rem; margin-bottom: 0.25rem; color: var(--text-muted);">Products</p>
+                            <h3 id="stat-products" style="font-size: 1.75rem; color: #d97706;">0</h3>
+                        </div>
+                        <div style="padding: 0.75rem; background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%); border-radius: 50%; box-shadow: 0 4px 15px rgba(217, 119, 6, 0.2);">
+                            <i class="ph-bold ph-package" style="color: #d97706; font-size: 1.25rem;"></i>
+                        </div>
                     </div>
-                    <div style="padding: 0.5rem; background: #ffedd5; color: #9a3412; border-radius: 50%;">
-                        <i class="ph-bold ph-package"></i>
-                    </div>
+                    <span style="color: #d97706; font-size: 0.85rem; font-weight: 600;">+2 new added</span>
                 </div>
-                <span style="color: #9a3412; font-size: 0.85rem; font-weight: 600;">+2 new added</span>
-            </div>
 
-            <div class="card" style="padding: 1.5rem;">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                    <div>
-                        <p style="font-size: 0.9rem; margin-bottom: 0.25rem;">Customers</p>
-                        <h3 style="font-size: 1.75rem;">1,250</h3>
+                <div class="card" style="padding: 1.5rem; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border: 1px solid var(--border); position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);"></div>
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div>
+                            <p style="font-size: 0.9rem; margin-bottom: 0.25rem; color: var(--text-muted);">Customers</p>
+                            <h3 style="font-size: 1.75rem; color: #9333ea;">1,250</h3>
+                        </div>
+                        <div style="padding: 0.75rem; background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); border-radius: 50%; box-shadow: 0 4px 15px rgba(147, 51, 234, 0.2);">
+                            <i class="ph-bold ph-users" style="color: #9333ea; font-size: 1.25rem;"></i>
+                        </div>
                     </div>
-                    <div style="padding: 0.5rem; background: #f3e8ff; color: #6b21a8; border-radius: 50%;">
-                        <i class="ph-bold ph-users"></i>
-                    </div>
+                    <span style="color: #9333ea; font-size: 0.85rem; font-weight: 600;">+18% from last month</span>
                 </div>
-                <span style="color: #6b21a8; font-size: 0.85rem; font-weight: 600;">+18% from last month</span>
             </div>
-        </div>
 
         <!-- Recent Orders Table -->
-        <div class="card" style="padding: 1.5rem;">
+        <div class="card" style="padding: 1.5rem; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-primary);"></div>
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                <h3>Recent Orders</h3>
+                <h3 style="background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Recent Orders</h3>
                 <a href="@Url.Action("Orders", "Admin")" class="btn btn-outline" style="font-size: 0.9rem;">View All</a>
             </div>
             
