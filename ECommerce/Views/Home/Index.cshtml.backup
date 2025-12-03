@@ -202,6 +202,8 @@
     </div>
 </div>
 
+<!-- Modal moved to bottom -->
+
 <script type="module">
     // Fetch Data
     let res = await fetch("@Url.Content("~/Content/Data/vegs.json")");
@@ -277,9 +279,12 @@
                 </button>
             `;
 
-            // Heart button functionality
+            // Heart button functionality - SET UP FIRST before other event listeners
             const heartBtn = card.querySelector(".heart-btn");
             const heartIcon = card.querySelector("[data-heart-icon]");
+            const heartId = `heart-${productId}-${Date.now()}`;
+            heartBtn.setAttribute('data-vue-btn', heartId);
+            heartBtn.setAttribute('data-product-id', productId);
             
             // Function to update heart icon appearance
             function updateHeartIcon(isFavorited) {
@@ -295,103 +300,179 @@
             }
             
             // Load initial favorite state
-            try {
-                const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-                updateHeartIcon(favorites.includes(productId));
-            } catch (e) {
-                updateHeartIcon(false);
+            function loadFavoriteState() {
+                try {
+                    const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+                    const isFavorited = favorites.includes(productId);
+                    updateHeartIcon(isFavorited);
+                } catch (e) {
+                    console.error("Error loading favorites:", e);
+                    updateHeartIcon(false);
+                }
             }
             
-            // Heart button click handler using addEventListener with capture
-            heartBtn.addEventListener("click", function(e) {
-                e.stopPropagation();
-                e.stopImmediatePropagation();
-                e.preventDefault();
+            // Initialize favorite state
+            loadFavoriteState();
+            
+            // Heart button click handler - use direct onclick for maximum compatibility
+            heartBtn.onclick = function(e) {
+                if (e) {
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    e.preventDefault();
+                }
                 
-                console.log("Heart clicked:", productId);
+                console.log("Heart clicked for product:", productId);
                 
-                // Animation
-                this.style.transform = "scale(1.3)";
-                setTimeout(() => { this.style.transform = "scale(1)"; }, 200);
+                // Vue heart animation
+                heartBtn.style.transform = "scale(1.3)";
+                setTimeout(() => {
+                    heartBtn.style.transform = "scale(1)";
+                }, 200);
                 
                 try {
                     let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
                     const index = favorites.indexOf(productId);
                     
                     if (index > -1) {
+                        // Remove from favorites
                         favorites.splice(index, 1);
                         updateHeartIcon(false);
+                        console.log("Removed from favorites");
                     } else {
+                        // Add to favorites
                         favorites.push(productId);
                         updateHeartIcon(true);
+                        console.log("Added to favorites");
                     }
                     
                     localStorage.setItem("favorites", JSON.stringify(favorites));
-                    window.dispatchEvent(new CustomEvent('favoritesUpdated', { detail: { productId } }));
+                    
+                    // Dispatch custom event for other components
+                    window.dispatchEvent(new CustomEvent('favoritesUpdated', {
+                        detail: { productId: productId, isFavorited: index === -1 }
+                    }));
                 } catch (e) {
-                    console.error("Error:", e);
+                    console.error("Error updating favorites:", e);
                 }
-            }, true); // Capture phase
+                
+                return false;
+            };
             
-            // Prevent mousedown from propagating
-            heartBtn.addEventListener("mousedown", (e) => e.stopPropagation(), true);
+            // Also add event listener as backup
+            heartBtn.addEventListener("click", function(e) {
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+            }, true);
             
-            // Hover effects
+            // Handle mousedown to stop propagation early
+            heartBtn.addEventListener("mousedown", function(e) {
+                e.stopPropagation();
+            }, true);
+            
             heartBtn.addEventListener("mouseenter", function() {
-                if (this.getAttribute('data-favorited') !== 'true') {
+                const isFavorited = this.getAttribute('data-favorited') === 'true';
+                if (!isFavorited) {
                     this.style.transform = "scale(1.1)";
                     heartIcon.style.color = "var(--primary)";
                 }
             });
             heartBtn.addEventListener("mouseleave", function() {
-                if (this.getAttribute('data-favorited') !== 'true') {
+                const isFavorited = this.getAttribute('data-favorited') === 'true';
+                if (!isFavorited) {
                     this.style.transform = "scale(1)";
                     heartIcon.style.color = "";
                 }
             });
 
-            // Card Click Event for Modal (ignore heart button)
-            card.addEventListener("click", (e) => {
-                if (!e.target.closest('.heart-btn') && !e.target.closest('.add-btn')) {
+            // Click Event for Modal
+            card.querySelector("img").addEventListener("click", (e) => {
+                if (!e.target.closest('.heart-btn')) {
+                    openModal(item);
+                }
+            });
+            card.querySelector("h3").addEventListener("click", (e) => {
+                if (!e.target.closest('.heart-btn')) {
                     openModal(item);
                 }
             });
 
-            // Add to Cart Event
+            // Add to Cart Event with Vue animation
             const addBtn = card.querySelector(".add-btn");
+            const btnId = `btn-${productId}-${Date.now()}`;
+            addBtn.setAttribute('data-vue-btn', btnId);
+            
             addBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
+                // Vue button press animation
                 addBtn.style.transform = "scale(0.95)";
-                setTimeout(() => addBtn.style.transform = "translateY(-2px)", 150);
+                setTimeout(() => {
+                    addBtn.style.transform = "translateY(-2px)";
+                }, 150);
                 addToCart(item, 1);
             });
             
-            addBtn.addEventListener("mouseenter", () => addBtn.classList.add('vue-btn-hover'));
-            addBtn.addEventListener("mouseleave", () => addBtn.classList.remove('vue-btn-hover'));
+            addBtn.addEventListener("mouseenter", function() {
+                this.classList.add('vue-btn-hover');
+            });
+            addBtn.addEventListener("mouseleave", function() {
+                this.classList.remove('vue-btn-hover');
+            });
 
-            // Card Hover Effects
+
+            // Show gradient line on hover with Vue animation
             card.addEventListener("mouseenter", function() {
-                const gradientLine = this.querySelector(".gradient-line");
-                if (gradientLine) gradientLine.style.opacity = "1";
+                const gradientLine = card.querySelector(".gradient-line");
+                if (gradientLine) {
+                    gradientLine.style.opacity = "1";
+                }
+                // Card lift effect
                 this.style.transform = "translateY(-4px)";
                 this.style.boxShadow = "0 8px 24px rgba(45, 106, 79, 0.15)";
-                const img = this.querySelector("img");
-                if (img) img.style.transform = "scale(1.05)";
+                // Image zoom on hover
+                const img = card.querySelector("img");
+                if (img) {
+                    img.style.transform = "scale(1.05)";
+                }
             });
-            
             card.addEventListener("mouseleave", function() {
-                const gradientLine = this.querySelector(".gradient-line");
-                if (gradientLine) gradientLine.style.opacity = "0";
+                const gradientLine = card.querySelector(".gradient-line");
+                if (gradientLine) {
+                    gradientLine.style.opacity = "0";
+                }
+                // Reset card
                 this.style.transform = "translateY(0)";
                 this.style.boxShadow = "";
-                const img = this.querySelector("img");
-                if (img) img.style.transform = "scale(1)";
+                // Reset image zoom
+                const img = card.querySelector("img");
+                if (img) {
+                    img.style.transform = "scale(1)";
+                }
             });
 
             mainGrid.appendChild(card);
+            
+            // Reinitialize AOS for new elements
+            if (typeof AOS !== 'undefined') {
+                AOS.refresh();
+            }
+            
+            // Reinitialize Vue animations for new buttons
+            if (typeof window.initVueAnimations === 'function') {
+                setTimeout(() => {
+                    window.initVueAnimations();
+                }, 100);
+            }
+            
+            // Listen for favorites updates from other cards
+            const favoritesUpdateHandler = function(e) {
+                const updatedProductId = e.detail.productId;
+                if (updatedProductId === productId && typeof window[`loadFavorite_${productId}`] === 'function') {
+                    window[`loadFavorite_${productId}`]();
+                }
+            };
+            window.addEventListener('favoritesUpdated', favoritesUpdateHandler);
         });
-        
-        if (typeof AOS !== 'undefined') AOS.refresh();
     }
 
     // Modal Logic
@@ -440,44 +521,6 @@
             modal.style.opacity = "0";
             modalContent.style.transform = "scale(0.9)";
             setTimeout(() => modal.style.display = "none", 300);
-        };
-        
-        document.getElementById("plus").onclick = () => {
-            qty++;
-            updateModalQty(qty, item.price);
-        };
-        
-        document.getElementById("minus").onclick = () => {
-            if (qty > 1) qty--;
-            updateModalQty(qty, item.price);
-        };
-
-        document.getElementById("modal-add").onclick = () => {
-            addToCart(item, qty);
-            modal.style.opacity = "0";
-            modalContent.style.transform = "scale(0.9)";
-            setTimeout(() => modal.style.display = "none", 300);
-        };
-    }
-
-    function updateModalQty(q, price) {
-        document.getElementById("qty-display").textContent = q;
-        document.getElementById("modal-add").textContent = `Add to Cart - $${q * price}`;
-    }
-
-    // Close modal on outside click
-    modal.addEventListener("click", (e) => {
-        if (e.target === modal) {
-            modal.style.opacity = "0";
-            modalContent.style.transform = "scale(0.9)";
-            setTimeout(() => modal.style.display = "none", 300);
-        }
-    });
-
-    // Cart Logic
-    function addToCart(item, quantity) {
-        let existing = checkedProducts.find(p => p.name === item.name);
-        
         if (existing) {
             existing.amount += quantity;
             existing.totalPrice = existing.amount * existing.price;
@@ -510,9 +553,6 @@
                 modal.style.opacity = "1";
                 modalContent.style.transform = "scale(1)";
             }, 10);
-        } else if (modal) {
-             // Fallback if vue-modal-content class is missing
-             modal.style.display = "flex";
         }
     }
 
@@ -526,8 +566,6 @@
             setTimeout(() => {
                 modal.style.display = "none";
             }, 300);
-        } else if (modal) {
-             modal.style.display = "none";
         }
     }
     
@@ -537,14 +575,14 @@
 
 <!-- Added to Cart Modal -->
 <div id="cart-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 9999; align-items: center; justify-content: center;">
-    <div class="card vue-modal-content" style="padding: 2rem; text-align: center; max-width: 400px; width: 90%; box-shadow: var(--shadow-lg); transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+    <div class="card" style="padding: 2rem; text-align: center; max-width: 400px; width: 90%; box-shadow: var(--shadow-lg);">
         <div style="width: 60px; height: 60px; background: #dcfce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; color: #166534;">
             <i class="ph-fill ph-check" style="font-size: 2.5rem;"></i>
         </div>
         <h3 style="margin-bottom: 0.5rem;">Added to Cart!</h3>
         <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Item has been successfully added to your shopping cart.</p>
         <div style="display: flex; gap: 1rem;">
-            <button type="button" onclick="closeCartModal()" class="btn btn-outline" style="flex: 1;">Continue Shopping</button>
+            <button type="button" onclick="closeCartModal(); setTimeout(function(){ window.location.href='@Url.Action("Index", "Home")'; }, 100);" class="btn btn-outline" style="flex: 1;">Continue Shopping</button>
             <a href="@Url.Action("Index", "Cart")" class="btn btn-primary" style="flex: 1;">View Cart</a>
         </div>
     </div>

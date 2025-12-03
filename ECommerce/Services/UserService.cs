@@ -19,7 +19,7 @@ namespace ECommerce.Services
         public List<User> GetAllUsers()
         {
             return CacheDataService.GetUsers(_httpContext);
-        }
+        } 
 
         public User GetUserById(int id)
         {
