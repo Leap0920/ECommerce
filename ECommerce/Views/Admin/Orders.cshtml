@@ -48,16 +48,21 @@
 
     async function loadOrders() {
         try {
+            console.log('[Admin Orders] Loading all orders...');
             const response = await fetch('/api/orders');
+            console.log('[Admin Orders] Response status:', response.status);
             const result = await response.json();
+            console.log('[Admin Orders] API response:', result);
             
             tbody.innerHTML = "";
             
             if (!result.success || !result.data || result.data.length === 0) {
+                console.log('[Admin Orders] No orders found or API error:', result.message);
                 tbody.innerHTML = `<tr><td colspan="7" style="padding: 3rem; text-align: center; color: var(--text-muted);">No orders found.</td></tr>`;
                 return;
             }
 
+            console.log('[Admin Orders] Found', result.data.length, 'orders');
             result.data.forEach(order => {
                 const date = new Date(order.OrderDate).toLocaleDateString();
                 const tr = document.createElement("tr");
@@ -102,7 +107,7 @@
                 tbody.appendChild(tr);
             });
         } catch (error) {
-            console.error(error);
+            console.error('[Admin Orders] Error:', error);
             tbody.innerHTML = `<tr><td colspan="7" style="padding: 3rem; text-align: center; color: var(--text-muted);">Error loading orders.</td></tr>`;
         }
     }

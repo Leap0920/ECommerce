@@ -136,8 +136,13 @@ namespace ECommerce.Controllers.Api
                     return Json(new { success = false, message = "Invalid request data" });
                 }
 
+                var userId = GetCurrentUserId();
                 var sessionId = GetSessionId();
-                var cartItems = _cartRepository.GetBySessionId(sessionId);
+                
+                // Get cart items - use user_id for logged-in users, session_id for guests
+                var cartItems = userId.HasValue
+                    ? _cartRepository.GetByUserId(userId.Value)
+                    : _cartRepository.GetBySessionId(sessionId);
 
                 if (!cartItems.Any())
                 {
@@ -150,7 +155,7 @@ namespace ECommerce.Controllers.Api
 
                 var order = new Order
                 {
-                    UserId = GetCurrentUserId(),
+                    UserId = userId,
                     CustomerName = request.CustomerName,
                     CustomerEmail = request.CustomerEmail,
                     Phone = request.Phone,
@@ -176,8 +181,15 @@ namespace ECommerce.Controllers.Api
 
                 var createdOrder = _orderRepository.Create(order);
 
-                // Clear the cart after successful order
-                _cartRepository.ClearCart(sessionId);
+                // Clear the cart after successful order - use user_id for logged-in users
+                if (userId.HasValue)
+                {
+                    _cartRepository.ClearCartByUserId(userId.Value);
+                }
+                else
+                {
+                    _cartRepository.ClearCart(sessionId);
+                }
 
                 return Json(new
                 {

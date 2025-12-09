@@ -142,7 +142,7 @@
 
         // Fetch Recent Orders
         try {
-            const response = await fetch('/api/orders/recent?count=5');
+            const response = await fetch('/api/orders/recent/5');
             const result = await response.json();
             
             const tbody = document.getElementById("recent-orders-body");

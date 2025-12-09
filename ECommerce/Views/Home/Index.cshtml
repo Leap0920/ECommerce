@@ -486,7 +486,42 @@
         }
     });
 
-    // Cart Logic
+    // Cart Logic - User-specific cart storage
+    let currentUserId = null;
+    
+    // Check if user is logged in and get their ID
+    async function initUserCart() {
+        try {
+            const response = await fetch('/api/auth/current');
+            const result = await response.json();
+            if (result.success && result.data) {
+                currentUserId = result.data.id;
+                // Load user-specific cart
+                const userCartKey = `cart_user_${currentUserId}`;
+                const userCart = JSON.parse(localStorage.getItem(userCartKey)) || [];
+                if (userCart.length > 0) {
+                    checkedProducts = userCart;
+                }
+            }
+        } catch (e) {
+            console.log('Guest user');
+        }
+    }
+    
+    // Initialize user cart on page load
+    initUserCart();
+    
+    function getCartKey() {
+        return currentUserId ? `cart_user_${currentUserId}` : 'cart_guest';
+    }
+    
+    function saveCart() {
+        const key = getCartKey();
+        localStorage.setItem(key, JSON.stringify(checkedProducts));
+        // Also update legacy key for compatibility
+        localStorage.setItem("checkedProducts", JSON.stringify(checkedProducts));
+    }
+    
     function addToCart(item, quantity) {
         let existing = checkedProducts.find(p => p.id === item.Id);
         
@@ -495,29 +530,30 @@
             existing.totalPrice = existing.amount * existing.price;
         } else {
             checkedProducts.push({
-                id: item.Id, // Store ID
+                id: item.Id,
                 img: item.Image,
                 name: item.Name,
                 price: item.Price,
                 amount: quantity,
                 totalPrice: item.Price * quantity,
-                type: item.Type
+                type: item.Type,
+                selected: true // Default to selected for checkout
             });
         }
         
-        localStorage.setItem("checkedProducts", JSON.stringify(checkedProducts));
+        saveCart();
         
         // Dispatch custom event to update cart badge
         window.dispatchEvent(new Event('cartUpdated'));
         
-        // API Call to add to persistent cart if user is logged in
+        // API Call to add to persistent cart (works for both logged-in and guest users)
         fetch('/api/cart/add', {
             method: 'POST',
             body: new URLSearchParams({
                 productId: item.Id,
                 quantity: quantity
             })
-        }).catch(err => console.log('Cart sync error (likely not logged in):', err));
+        }).catch(err => console.log('Cart sync error:', err));
         
         showCartModal();
     }

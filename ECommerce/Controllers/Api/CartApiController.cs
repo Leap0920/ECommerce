@@ -41,8 +41,14 @@ namespace ECommerce.Controllers.Api
         {
             try
             {
+                var userId = GetCurrentUserId();
                 var sessionId = GetSessionId();
-                var cartItems = _cartRepository.GetBySessionId(sessionId);
+                
+                // If user is logged in, get cart by user_id; otherwise use session_id
+                var cartItems = userId.HasValue 
+                    ? _cartRepository.GetByUserId(userId.Value)
+                    : _cartRepository.GetBySessionId(sessionId);
+                    
                 var total = cartItems.Sum(c => c.TotalPrice);
                 var itemCount = cartItems.Sum(c => c.Quantity);
 
@@ -75,13 +81,24 @@ namespace ECommerce.Controllers.Api
                     return Json(new { success = false, message = "Product not found" });
                 }
 
-                var sessionId = GetSessionId();
                 var userId = GetCurrentUserId();
+                var sessionId = GetSessionId();
 
-                var cartItem = _cartRepository.AddItem(sessionId, userId, productId, quantity);
+                // Use user_id for logged-in users, session_id for guests
+                CartItem cartItem;
+                if (userId.HasValue)
+                {
+                    cartItem = _cartRepository.AddItemByUserId(userId.Value, productId, quantity);
+                }
+                else
+                {
+                    cartItem = _cartRepository.AddItem(sessionId, null, productId, quantity);
+                }
 
                 // Get updated cart
-                var cartItems = _cartRepository.GetBySessionId(sessionId);
+                var cartItems = userId.HasValue
+                    ? _cartRepository.GetByUserId(userId.Value)
+                    : _cartRepository.GetBySessionId(sessionId);
                 var total = cartItems.Sum(c => c.TotalPrice);
                 var itemCount = cartItems.Sum(c => c.Quantity);
 
@@ -109,11 +126,23 @@ namespace ECommerce.Controllers.Api
         {
             try
             {
+                var userId = GetCurrentUserId();
                 var sessionId = GetSessionId();
-                _cartRepository.UpdateQuantity(sessionId, productId, quantity);
+
+                // Use user_id for logged-in users
+                if (userId.HasValue)
+                {
+                    _cartRepository.UpdateQuantityByUserId(userId.Value, productId, quantity);
+                }
+                else
+                {
+                    _cartRepository.UpdateQuantity(sessionId, productId, quantity);
+                }
 
                 // Get updated cart
-                var cartItems = _cartRepository.GetBySessionId(sessionId);
+                var cartItems = userId.HasValue
+                    ? _cartRepository.GetByUserId(userId.Value)
+                    : _cartRepository.GetBySessionId(sessionId);
                 var total = cartItems.Sum(c => c.TotalPrice);
                 var itemCount = cartItems.Sum(c => c.Quantity);
 
@@ -141,11 +170,23 @@ namespace ECommerce.Controllers.Api
         {
             try
             {
+                var userId = GetCurrentUserId();
                 var sessionId = GetSessionId();
-                _cartRepository.RemoveItem(sessionId, productId);
+
+                // Use user_id for logged-in users
+                if (userId.HasValue)
+                {
+                    _cartRepository.RemoveItemByUserId(userId.Value, productId);
+                }
+                else
+                {
+                    _cartRepository.RemoveItem(sessionId, productId);
+                }
 
                 // Get updated cart
-                var cartItems = _cartRepository.GetBySessionId(sessionId);
+                var cartItems = userId.HasValue
+                    ? _cartRepository.GetByUserId(userId.Value)
+                    : _cartRepository.GetBySessionId(sessionId);
                 var total = cartItems.Sum(c => c.TotalPrice);
                 var itemCount = cartItems.Sum(c => c.Quantity);
 
@@ -173,8 +214,18 @@ namespace ECommerce.Controllers.Api
         {
             try
             {
+                var userId = GetCurrentUserId();
                 var sessionId = GetSessionId();
-                _cartRepository.ClearCart(sessionId);
+
+                // Use user_id for logged-in users
+                if (userId.HasValue)
+                {
+                    _cartRepository.ClearCartByUserId(userId.Value);
+                }
+                else
+                {
+                    _cartRepository.ClearCart(sessionId);
+                }
 
                 return Json(new
                 {
@@ -200,8 +251,12 @@ namespace ECommerce.Controllers.Api
         {
             try
             {
+                var userId = GetCurrentUserId();
                 var sessionId = GetSessionId();
-                var cartItems = _cartRepository.GetBySessionId(sessionId);
+
+                var cartItems = userId.HasValue
+                    ? _cartRepository.GetByUserId(userId.Value)
+                    : _cartRepository.GetBySessionId(sessionId);
                 var itemCount = cartItems.Sum(c => c.Quantity);
 
                 return Json(new { success = true, count = itemCount }, JsonRequestBehavior.AllowGet);
@@ -213,3 +268,4 @@ namespace ECommerce.Controllers.Api
         }
     }
 }
+

@@ -246,14 +246,29 @@
         // Confirm logout and perform logout action
         async function confirmLogout() {
             try {
+                // Get current user ID before logout
+                let userIdToLogout = null;
+                try {
+                    const authResponse = await fetch('/api/auth/current');
+                    const authResult = await authResponse.json();
+                    if (authResult.success && authResult.data) {
+                        userIdToLogout = authResult.data.id;
+                    }
+                } catch (e) {}
+                
                 await fetch('/api/auth/logout', { method: 'POST' });
+                
+                // Clear user-specific data but keep the cart for when they log back in
                 localStorage.removeItem('user');
+                localStorage.removeItem('checkedProducts'); // Clear checkout items
+                
                 hideLogoutModal();
                 // Redirect to home page
                 window.location.href = '@Url.Action("Index", "Home")';
             } catch (error) {
                 console.error('Logout error:', error);
                 localStorage.removeItem('user');
+                localStorage.removeItem('checkedProducts');
                 hideLogoutModal();
                 window.location.href = '@Url.Action("Index", "Home")';
             }
@@ -277,19 +292,48 @@
     
     <!-- Cart Badge Update Script -->
     <script>
+        let layoutCurrentUserId = null;
+        
+        async function initCartBadge() {
+            try {
+                const response = await fetch('/api/auth/current');
+                const result = await response.json();
+                if (result.success && result.data) {
+                    layoutCurrentUserId = result.data.id;
+                }
+            } catch (e) {
+                // Guest user
+            }
+            updateCartBadge();
+        }
+        
+        function getLayoutCartKey() {
+            return layoutCurrentUserId ? `cart_user_${layoutCurrentUserId}` : 'cart_guest';
+        }
+        
         function updateCartBadge() {
-            const cart = JSON.parse(localStorage.getItem("checkedProducts")) || [];
+            // Try to get user-specific cart first, then fall back to legacy key
+            const userCartKey = getLayoutCartKey();
+            let cart = JSON.parse(localStorage.getItem(userCartKey)) || [];
+            
+            // If user cart is empty, check legacy key
+            if (cart.length === 0) {
+                cart = JSON.parse(localStorage.getItem("checkedProducts")) || [];
+            }
+            
             const badge = document.getElementById("cart-badge");
-            if (cart.length > 0) {
-                badge.textContent = cart.length;
-                badge.style.display = "flex";
-            } else {
-                badge.style.display = "none";
+            if (badge) {
+                if (cart.length > 0) {
+                    badge.textContent = cart.length;
+                    badge.style.display = "flex";
+                } else {
+                    badge.style.display = "none";
+                }
             }
         }
         
-        // Update on page load
-        updateCartBadge();
+        // Initialize cart badge
+        initCartBadge();
         
         // Listen for storage events (updates from other tabs)
         window.addEventListener('storage', updateCartBadge);

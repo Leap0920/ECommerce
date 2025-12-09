@@ -132,5 +132,100 @@ namespace ECommerce.Repositories
                 return true;
             }
         }
+
+        public CartItem AddItemByUserId(int userId, int productId, int quantity)
+        {
+            using (var connection = DatabaseConfig.GetConnection())
+            {
+                // Check if item already exists in user's cart
+                const string checkSql = @"
+                    SELECT id FROM cart_items 
+                    WHERE user_id = @UserId AND product_id = @ProductId";
+                var existingId = connection.ExecuteScalar<int?>(checkSql, new { UserId = userId, ProductId = productId });
+
+                if (existingId.HasValue)
+                {
+                    // Update quantity
+                    const string updateSql = @"
+                        UPDATE cart_items 
+                        SET quantity = quantity + @Quantity 
+                        WHERE id = @Id";
+                    connection.Execute(updateSql, new { Id = existingId.Value, Quantity = quantity });
+                }
+                else
+                {
+                    // Insert new item with a placeholder session_id
+                    const string insertSql = @"
+                        INSERT INTO cart_items (session_id, user_id, product_id, quantity) 
+                        VALUES (@SessionId, @UserId, @ProductId, @Quantity)";
+                    connection.Execute(insertSql, new { SessionId = "user_" + userId, UserId = userId, ProductId = productId, Quantity = quantity });
+                }
+
+                // Return the cart item with product details
+                const string selectSql = @"
+                    SELECT c.id as Id, c.product_id as ProductId, c.quantity as Quantity,
+                           p.name as ProductName, p.image as ProductImage, p.price as Price,
+                           p.type as Type, (p.price * c.quantity) as TotalPrice
+                    FROM cart_items c
+                    INNER JOIN products p ON c.product_id = p.id
+                    WHERE c.user_id = @UserId AND c.product_id = @ProductId";
+                return connection.QueryFirstOrDefault<CartItem>(selectSql, new { UserId = userId, ProductId = productId });
+            }
+        }
+
+        public bool UpdateQuantityByUserId(int userId, int productId, int quantity)
+        {
+            using (var connection = DatabaseConfig.GetConnection())
+            {
+                if (quantity <= 0)
+                {
+                    return RemoveItemByUserId(userId, productId);
+                }
+
+                const string sql = @"
+                    UPDATE cart_items 
+                    SET quantity = @Quantity 
+                    WHERE user_id = @UserId AND product_id = @ProductId";
+                var rowsAffected = connection.Execute(sql, new { UserId = userId, ProductId = productId, Quantity = quantity });
+                return rowsAffected > 0;
+            }
+        }
+
+        public bool RemoveItemByUserId(int userId, int productId)
+        {
+            using (var connection = DatabaseConfig.GetConnection())
+            {
+                const string sql = @"
+                    DELETE FROM cart_items 
+                    WHERE user_id = @UserId AND product_id = @ProductId";
+                var rowsAffected = connection.Execute(sql, new { UserId = userId, ProductId = productId });
+                return rowsAffected > 0;
+            }
+        }
+
+        public bool ClearCartByUserId(int userId)
+        {
+            using (var connection = DatabaseConfig.GetConnection())
+            {
+                const string sql = "DELETE FROM cart_items WHERE user_id = @UserId";
+                connection.Execute(sql, new { UserId = userId });
+                return true;
+            }
+        }
+
+        public bool RemoveItemsByProductIds(int userId, List<int> productIds)
+        {
+            if (productIds == null || productIds.Count == 0)
+                return true;
+
+            using (var connection = DatabaseConfig.GetConnection())
+            {
+                const string sql = @"
+                    DELETE FROM cart_items 
+                    WHERE user_id = @UserId AND product_id IN @ProductIds";
+                connection.Execute(sql, new { UserId = userId, ProductIds = productIds });
+                return true;
+            }
+        }
     }
 }

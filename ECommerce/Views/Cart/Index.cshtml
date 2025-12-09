@@ -9,7 +9,11 @@
         <!-- Cart Items -->
         <div class="card" style="padding: 0; overflow: hidden;">
             <div style="padding: 1.5rem; border-bottom: 1px solid var(--border); background: #f9fafb;">
-                <div style="display: grid; grid-template-columns: 3fr 1fr 1fr 1fr auto; gap: 1rem; font-weight: 600; color: var(--text-muted); font-size: 0.9rem;">
+                <div style="display: grid; grid-template-columns: auto 3fr 1fr 1fr 1fr auto; gap: 1rem; font-weight: 600; color: var(--text-muted); font-size: 0.9rem; align-items: center;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll(this.checked)" style="width: 18px; height: 18px; accent-color: var(--primary);">
+                        <span>All</span>
+                    </label>
                     <span>Product</span>
                     <span>Price</span>
                     <span>Quantity</span>
@@ -34,6 +38,10 @@
         <div class="card" style="padding: 2rem; height: fit-content; position: sticky; top: 100px;">
             <h3 style="margin-bottom: 1.5rem;">Order Summary</h3>
             
+            <div id="selected-items-info" style="padding: 0.75rem; background: #f0fdf4; border-radius: 8px; margin-bottom: 1rem; display: none;">
+                <span style="color: #166534; font-size: 0.9rem;"><i class="ph ph-check-circle" style="margin-right: 0.25rem;"></i> <span id="selected-count">0</span> item(s) selected for checkout</span>
+            </div>
+            
             <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
                 <div style="display: flex; justify-content: space-between;">
                     <span style="color: var(--text-muted);">Subtotal</span>
@@ -54,9 +62,9 @@
                 </div>
             </div>
 
-            <a href="@Url.Action("Checkout", "Cart")" class="btn btn-primary vue-btn" style="width: 100%; justify-content: center;" data-vue-btn="cart-checkout">
-                Proceed to Checkout <i class="ph-bold ph-arrow-right" style="margin-left: 0.5rem;"></i>
-            </a>
+            <button id="checkout-btn" onclick="proceedToCheckout()" class="btn btn-primary vue-btn" style="width: 100%; justify-content: center;" data-vue-btn="cart-checkout" disabled>
+                Select items to checkout <i class="ph-bold ph-arrow-right" style="margin-left: 0.5rem;"></i>
+            </button>
             
             <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem; justify-content: center; color: var(--text-muted);">
                 <i class="ph-fill ph-lock-key"></i>
@@ -69,40 +77,66 @@
 <script>
     const cartContainer = document.getElementById('cart-items-container');
     const emptyMsg = document.getElementById('empty-cart-msg');
-    let cart = JSON.parse(localStorage.getItem("checkedProducts")) || [];
+    let cart = [];
+    let currentUserId = null;
+
+    // Get user-specific cart key
+    function getCartKey() {
+        return currentUserId ? `cart_user_${currentUserId}` : 'cart_guest';
+    }
+
+    // Load cart from localStorage based on user
+    function loadLocalCart() {
+        const key = getCartKey();
+        return JSON.parse(localStorage.getItem(key)) || [];
+    }
+
+    // Save cart to localStorage based on user
+    function saveLocalCart(cartData) {
+        const key = getCartKey();
+        localStorage.setItem(key, JSON.stringify(cartData));
+        // Also update the legacy key for checkout compatibility
+        const selectedItems = cartData.filter(item => item.selected);
+        localStorage.setItem("checkedProducts", JSON.stringify(selectedItems));
+    }
 
     // Sync with server if logged in
     document.addEventListener('DOMContentLoaded', async () => {
         try {
-            // First check if we have items on the server
+            // Check if user is logged in
+            const authResponse = await fetch('/api/auth/current');
+            const authResult = await authResponse.json();
+            
+            if (authResult.success && authResult.data) {
+                currentUserId = authResult.data.id;
+            }
+            
+            // Load cart from server (prioritize server data for logged-in users)
             const response = await fetch('/api/cart');
             const result = await response.json();
             
             if (result.success && result.data && result.data.items && result.data.items.length > 0) {
-                // If server has items, we should merge or prioritize server items
-                // For simplicity in this demo, we'll map server items to our local format
-                const serverCart = result.data.items.map(item => ({
+                // Map server items to local format
+                cart = result.data.items.map(item => ({
                     id: item.ProductId,
-                    img: item.ProductImage || item.Image || '', // From joined Product data
-                    name: item.ProductName || item.Name,
+                    img: item.ProductImage || '',
+                    name: item.ProductName,
                     price: item.Price,
                     amount: item.Quantity,
                     totalPrice: item.Price * item.Quantity,
-                    type: item.Type || ''
+                    type: item.Type || '',
+                    selected: true // Default to selected
                 }));
-                
-                // If local cart is empty but server has items, use server items
-                if (cart.length === 0) {
-                    cart = serverCart;
-                    localStorage.setItem("checkedProducts", JSON.stringify(cart));
-                } 
-                // If both have items, we might want to prompt user, but let's stick to local for now
-                // or just trigger an update to server to ensure sync
+                saveLocalCart(cart);
+            } else {
+                // Fall back to local storage
+                cart = loadLocalCart();
             }
             
             renderCart();
         } catch (err) {
-            console.log('Not logged in or offline, using local cart');
+            console.log('Error loading cart, using local storage:', err);
+            cart = loadLocalCart();
             renderCart();
         }
     });
@@ -118,28 +152,34 @@
             document.getElementById('summary-subtotal').textContent = '\u20B10.00';
             document.getElementById('summary-tax').textContent = '\u20B10.00';
             document.getElementById('summary-total').textContent = '\u20B10.00';
+            document.getElementById('checkout-btn').disabled = true;
+            document.getElementById('checkout-btn').textContent = 'Select items to checkout';
+            document.getElementById('selected-items-info').style.display = 'none';
             return;
         }
 
         emptyMsg.style.display = 'none';
-        let subtotal = 0;
 
         cart.forEach((item, index) => {
             // Ensure numbers
             if (!item.amount) item.amount = 1;
             if (!item.totalPrice) item.totalPrice = item.price * item.amount;
-            
-            subtotal += item.totalPrice;
+            if (item.selected === undefined) item.selected = true;
             
             const row = document.createElement('div');
             row.style.display = 'grid';
-            row.style.gridTemplateColumns = '3fr 1fr 1fr 1fr auto';
+            row.style.gridTemplateColumns = 'auto 3fr 1fr 1fr 1fr auto';
             row.style.gap = '1rem';
             row.style.alignItems = 'center';
             row.style.borderBottom = '1px solid var(--border)';
             row.style.paddingBottom = '1.5rem';
+            row.style.opacity = item.selected ? '1' : '0.6';
+            row.style.transition = 'opacity 0.2s';
             
             row.innerHTML = `
+                <div>
+                    <input type="checkbox" class="item-checkbox" data-index="${index}" ${item.selected ? 'checked' : ''} onchange="toggleItemSelection(${index}, this.checked)" style="width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer;">
+                </div>
                 <div style="display: flex; gap: 1rem; align-items: center;">
                     <img src="${item.img}" style="width: 60px; height: 60px; object-fit: contain; background: #f9fafb; border-radius: var(--radius-sm); padding: 5px;" onerror="this.src='/Content/images/placeholder.jpg'">
                     <div>
@@ -162,25 +202,77 @@
             cartContainer.appendChild(row);
         });
 
+        updateSummary();
+        updateSelectAllCheckbox();
+    }
+
+    function updateSummary() {
+        const selectedItems = cart.filter(item => item.selected);
+        let subtotal = selectedItems.reduce((sum, item) => sum + item.totalPrice, 0);
+        
         const tax = subtotal * 0.12;
         const total = subtotal + tax;
 
         document.getElementById('summary-subtotal').textContent = `\u20B1${subtotal.toFixed(2)}`;
         document.getElementById('summary-tax').textContent = `\u20B1${tax.toFixed(2)}`;
         document.getElementById('summary-total').textContent = `\u20B1${total.toFixed(2)}`;
+        
+        const checkoutBtn = document.getElementById('checkout-btn');
+        const selectedInfo = document.getElementById('selected-items-info');
+        
+        if (selectedItems.length > 0) {
+            checkoutBtn.disabled = false;
+            checkoutBtn.innerHTML = 'Proceed to Checkout <i class="ph-bold ph-arrow-right" style="margin-left: 0.5rem;"></i>';
+            selectedInfo.style.display = 'block';
+            document.getElementById('selected-count').textContent = selectedItems.length;
+        } else {
+            checkoutBtn.disabled = true;
+            checkoutBtn.innerHTML = 'Select items to checkout';
+            selectedInfo.style.display = 'none';
+        }
+        
+        // Save selected items for checkout
+        saveLocalCart(cart);
     }
+
+    function updateSelectAllCheckbox() {
+        const selectAllCheckbox = document.getElementById('select-all-checkbox');
+        const allSelected = cart.length > 0 && cart.every(item => item.selected);
+        const someSelected = cart.some(item => item.selected);
+        
+        selectAllCheckbox.checked = allSelected;
+        selectAllCheckbox.indeterminate = someSelected && !allSelected;
+    }
+
+    window.toggleSelectAll = function(checked) {
+        cart.forEach(item => item.selected = checked);
+        renderCart();
+    };
+
+    window.toggleItemSelection = function(index, checked) {
+        cart[index].selected = checked;
+        saveLocalCart(cart);
+        updateSummary();
+        updateSelectAllCheckbox();
+        
+        // Update row opacity
+        const rows = cartContainer.querySelectorAll('div[style*="grid-template-columns"]');
+        if (rows[index]) {
+            rows[index].style.opacity = checked ? '1' : '0.6';
+        }
+    };
 
     window.updateQty = function(index, change) {
         if (cart[index].amount + change > 0) {
             cart[index].amount += change;
             cart[index].totalPrice = cart[index].amount * cart[index].price;
-            saveAndRender();
+            saveLocalCart(cart);
+            renderCart();
             
-            // Sync with backend if logged in
+            // Sync with backend
             if (cart[index].id) {
                 fetch('/api/cart/update', {
                     method: 'POST',
-                    // Using URLSearchParams ensures standard MVC binding works for simple parameters
                     body: new URLSearchParams({
                         productId: cart[index].id,
                         quantity: cart[index].amount
@@ -193,9 +285,11 @@
     window.removeItem = function(index) {
         const itemToRemove = cart[index];
         cart.splice(index, 1);
-        saveAndRender();
+        saveLocalCart(cart);
+        window.dispatchEvent(new Event('cartUpdated'));
+        renderCart();
         
-        // Sync with backend if logged in
+        // Sync with backend
         if (itemToRemove.id) {
             fetch('/api/cart/remove', {
                 method: 'POST',
@@ -204,9 +298,14 @@
         }
     };
 
-    function saveAndRender() {
-        localStorage.setItem("checkedProducts", JSON.stringify(cart));
-        window.dispatchEvent(new Event('cartUpdated')); // Update badge
-        renderCart();
-    }
+    window.proceedToCheckout = function() {
+        const selectedItems = cart.filter(item => item.selected);
+        if (selectedItems.length === 0) {
+            alert('Please select at least one item to checkout');
+            return;
+        }
+        // Save only selected items for checkout
+        localStorage.setItem("checkedProducts", JSON.stringify(selectedItems));
+        window.location.href = '@Url.Action("Checkout", "Cart")';
+    };
 </script>

@@ -2,6 +2,7 @@ namespace ECommerce.Models
 {
     public class CartItem
     {
+        public int Id { get; set; }
         public int ProductId { get; set; }
         public string ProductName { get; set; }
         public string ProductImage { get; set; }
@@ -9,6 +10,7 @@ namespace ECommerce.Models
         public int Quantity { get; set; }
         public decimal TotalPrice { get; set; }
         public string Type { get; set; }
+        public bool Selected { get; set; } = true;
     }
 }
 

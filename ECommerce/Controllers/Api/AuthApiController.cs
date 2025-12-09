@@ -46,11 +46,25 @@ namespace ECommerce.Controllers.Api
                     return Json(new { success = false, message = "Account is inactive" });
                 }
 
+                // Transfer guest cart to user before updating session
+                var guestSessionId = Session.SessionID;
+
                 // Store user info in session
                 Session["UserId"] = user.Id;
                 Session["UserEmail"] = user.Email;
                 Session["UserName"] = $"{user.FirstName} {user.LastName}";
                 Session["UserRole"] = user.Role;
+
+                // Transfer any guest cart items to the user's cart
+                try
+                {
+                    var cartRepository = new CartRepository();
+                    cartRepository.TransferCartToUser(guestSessionId, user.Id);
+                }
+                catch
+                {
+                    // Ignore cart transfer errors - not critical
+                }
 
                 return Json(new
                 {

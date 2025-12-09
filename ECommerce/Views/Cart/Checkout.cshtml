@@ -262,13 +262,14 @@
 </style>
 
 <script>
-    // VERSION: 2024-12-09-v2 Debug - This should appear in console
-    console.log('=== CHECKOUT PAGE LOADED - VERSION 2024-12-09-v2 ===');
+    // VERSION: 2024-12-09-v3 - Fixed cart sync and order flow
+    console.log('=== CHECKOUT PAGE LOADED - VERSION 2024-12-09-v3 ===');
     
     const cart = JSON.parse(localStorage.getItem("checkedProducts")) || [];
     const itemsContainer = document.getElementById('checkout-items');
     let subtotal = 0;
     const shippingFee = 100; // Base shipping fee in PHP
+    let currentUserId = null;
 
     // Check auth status to pre-fill info
     document.addEventListener('DOMContentLoaded', async () => {
@@ -278,18 +279,20 @@
         }
         
         try {
-            await syncCart(); // Ensure backend cart is populated
-            
             const response = await fetch('/api/auth/current');
             const result = await response.json();
             if (result.success && result.data) {
+                currentUserId = result.data.id;
                 const nameParts = (result.data.name || '').split(' ');
                 document.getElementById('fname').value = nameParts[0] || '';
                 document.getElementById('lname').value = nameParts.slice(1).join(' ') || '';
                 document.getElementById('email').value = result.data.email || '';
             }
+            
+            // Sync selected items to backend cart
+            await syncCart();
         } catch (e) {
-            console.log("Guest checkout");
+            console.log("Guest checkout or sync error:", e);
         }
         
         renderSummary();
@@ -299,10 +302,10 @@
         if (cart.length === 0) return;
         
         try {
-            // First, clear the backend cart to ensure fresh sync
+            // First, clear the backend cart to ensure fresh sync with selected items only
             await fetch('/api/cart/clear', { method: 'POST' });
             
-            // Then add each item with the correct quantity
+            // Then add each selected item with the correct quantity
             for (const item of cart) {
                 if (item.id) {
                     const response = await fetch('/api/cart/add', {
@@ -316,10 +319,10 @@
                     }
                 }
             }
-            console.log('Cart synced successfully with', cart.length, 'items');
+            console.log('Cart synced successfully with', cart.length, 'selected items');
         } catch (error) {
             console.error('Cart sync error:', error);
-            throw new Error('Failed to sync cart. Please try again.');
+            // Don't throw - we can still proceed with local cart data
         }
     }
 
@@ -438,7 +441,17 @@
                     console.log('[Checkout] SUCCESS! Order ID:', result.data.orderId);
                     document.getElementById('order-id-display').textContent = result.data.orderId;
                     document.getElementById('success-modal').style.display = 'flex';
+                    
+                    // Clear the checked out items from local storage
                     localStorage.removeItem("checkedProducts");
+                    
+                    // Also clear user-specific cart if logged in
+                    if (currentUserId) {
+                        localStorage.removeItem(`cart_user_${currentUserId}`);
+                    } else {
+                        localStorage.removeItem('cart_guest');
+                    }
+                    
                     window.dispatchEvent(new Event('cartUpdated'));
                 } else {
                     console.log('[Checkout] FAILED: API returned success=false');
@@ -466,7 +479,13 @@
     });
 
     window.finishCheckout = function() {
+        // Clear all cart-related localStorage
         localStorage.removeItem("checkedProducts");
+        if (currentUserId) {
+            localStorage.removeItem(`cart_user_${currentUserId}`);
+        } else {
+            localStorage.removeItem('cart_guest');
+        }
         window.dispatchEvent(new Event('cartUpdated'));
     };
 </script>

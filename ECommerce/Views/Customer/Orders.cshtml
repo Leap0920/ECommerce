@@ -255,23 +255,16 @@
     
     async function buyAgain(productId) {
         try {
-            // Add to cart
+            // Add to cart via API (uses form-urlencoded for MVC binding)
             const response = await fetch('/api/cart/add', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ productId: productId, quantity: 1 })
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: 'productId=' + encodeURIComponent(productId) + '&quantity=1'
             });
             const result = await response.json();
             
             if (result.success) {
-                // Update localStorage for cart badge
-                let cart = JSON.parse(localStorage.getItem('checkedProducts')) || [];
-                if (!cart.includes(productId)) {
-                    cart.push(productId);
-                    localStorage.setItem('checkedProducts', JSON.stringify(cart));
-                }
-                
-                // Trigger cart update
+                // Trigger cart update event
                 window.dispatchEvent(new Event('cartUpdated'));
                 
                 // Show success and redirect
