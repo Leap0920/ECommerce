@@ -304,11 +304,16 @@
                 document.querySelectorAll('[data-vue-btn]').forEach(btn => {
                     const btnId = btn.getAttribute('data-vue-btn');
                     
-                    // Remove existing listeners to avoid duplicates
-                    const newBtn = btn.cloneNode(true);
-                    btn.parentNode.replaceChild(newBtn, btn);
+                    // Skip cloning for checkout buttons to preserve their event handlers
+                    let targetBtn = btn;
+                    if (!btnId.startsWith('checkout-')) {
+                        // Remove existing listeners to avoid duplicates (only for non-checkout buttons)
+                        const newBtn = btn.cloneNode(true);
+                        btn.parentNode.replaceChild(newBtn, btn);
+                        targetBtn = newBtn;
+                    }
                     
-                    newBtn.addEventListener('mouseenter', function() {
+                    targetBtn.addEventListener('mouseenter', function() {
                         window.vueAnimations.setHover(btnId, true);
                         if (this.classList.contains('vue-icon-btn')) {
                             this.classList.add('vue-icon-hover');
@@ -317,7 +322,7 @@
                         }
                     });
                     
-                    newBtn.addEventListener('mouseleave', function() {
+                    targetBtn.addEventListener('mouseleave', function() {
                         window.vueAnimations.setHover(btnId, false);
                         if (this.classList.contains('vue-icon-btn')) {
                             this.classList.remove('vue-icon-hover');
@@ -326,7 +331,7 @@
                         }
                     });
                     
-                    newBtn.addEventListener('click', function(e) {
+                    targetBtn.addEventListener('click', function(e) {
                         window.vueAnimations.setActive(btnId, true);
                         // Add active class temporarily
                         this.classList.add('vue-btn-active');

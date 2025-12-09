@@ -107,10 +107,30 @@ namespace ECommerce.Controllers.Api
 
         // POST: api/orders/checkout
         [HttpPost]
-        public ActionResult Checkout(CheckoutRequest request)
+        public ActionResult Checkout()
         {
             try
             {
+                // Manually deserialize JSON from request body (ASP.NET MVC doesn't auto-bind JSON like Web API)
+                CheckoutRequest request = null;
+                try
+                {
+                    Request.InputStream.Position = 0;
+                    using (var reader = new System.IO.StreamReader(Request.InputStream))
+                    {
+                        var json = reader.ReadToEnd();
+                        if (!string.IsNullOrEmpty(json))
+                        {
+                            var serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                            request = serializer.Deserialize<CheckoutRequest>(json);
+                        }
+                    }
+                }
+                catch (Exception parseEx)
+                {
+                    return Json(new { success = false, message = "Failed to parse request: " + parseEx.Message });
+                }
+
                 if (request == null)
                 {
                     return Json(new { success = false, message = "Invalid request data" });

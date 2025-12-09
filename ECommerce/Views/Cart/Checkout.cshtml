@@ -239,12 +239,7 @@
         <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
             Order ID: <strong id="order-id-display" style="color: var(--primary);"></strong>
         </p>
-        <div style="background: var(--bg-alt); padding: 1rem; border-radius: var(--radius-md); margin-bottom: 1.5rem;">
-            <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0;">
-                <i class="ph ph-info" style="margin-right: 0.25rem;"></i>
-                You will receive an SMS/Email confirmation shortly.
-            </p>
-        </div>
+
         <div style="display: flex; gap: 1rem;">
             <a href="@Url.Action("Dashboard", "Customer")" class="btn btn-outline" style="flex: 1;">Go to Dashboard</a>
             <a href="@Url.Action("Orders", "Customer")" class="btn btn-primary vue-btn" onclick="finishCheckout()" style="flex: 1;" data-vue-btn="checkout-continue">View My Orders</a>
@@ -267,6 +262,9 @@
 </style>
 
 <script>
+    // VERSION: 2024-12-09-v2 Debug - This should appear in console
+    console.log('=== CHECKOUT PAGE LOADED - VERSION 2024-12-09-v2 ===');
+    
     const cart = JSON.parse(localStorage.getItem("checkedProducts")) || [];
     const itemsContainer = document.getElementById('checkout-items');
     let subtotal = 0;
@@ -300,18 +298,29 @@
     async function syncCart() {
         if (cart.length === 0) return;
         
-        const promises = cart.map(item => {
-            if (item.id) {
-                return fetch('/api/cart/add', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'productId=' + encodeURIComponent(item.id) + '&quantity=' + encodeURIComponent(item.amount)
-                });
+        try {
+            // First, clear the backend cart to ensure fresh sync
+            await fetch('/api/cart/clear', { method: 'POST' });
+            
+            // Then add each item with the correct quantity
+            for (const item of cart) {
+                if (item.id) {
+                    const response = await fetch('/api/cart/add', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: 'productId=' + encodeURIComponent(item.id) + '&quantity=' + encodeURIComponent(item.amount)
+                    });
+                    
+                    if (!response.ok) {
+                        console.error('Failed to sync item:', item.name);
+                    }
+                }
             }
-            return Promise.resolve();
-        });
-        
-        await Promise.all(promises);
+            console.log('Cart synced successfully with', cart.length, 'items');
+        } catch (error) {
+            console.error('Cart sync error:', error);
+            throw new Error('Failed to sync cart. Please try again.');
+        }
     }
 
     function renderSummary() {
@@ -350,82 +359,110 @@
         document.getElementById('chk-total').textContent = `\u20B1${total.toFixed(2)}`;
     }
 
-    // Place Order Logic
-    document.getElementById('place-order-btn').addEventListener('click', async function() {
-        const btn = this;
-        const errorDiv = document.getElementById('checkout-error');
-        errorDiv.style.display = 'none';
-
-        // Validation
-        const fname = document.getElementById('fname').value.trim();
-        const lname = document.getElementById('lname').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const phone = document.getElementById('phone').value.trim();
-        const address = document.getElementById('address').value.trim();
-        const barangay = document.getElementById('barangay').value.trim();
-        const city = document.getElementById('city').value.trim();
-        const province = document.getElementById('province').value;
-        const zip = document.getElementById('zip').value.trim();
-        const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
-
-        if (!fname || !lname || !email || !phone || !address || !barangay || !city || !province || !zip) {
-            document.getElementById('error-message').textContent = "Please fill in all required fields.";
-            errorDiv.style.display = 'block';
-            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Place Order Logic - Wait for DOM to be ready
+    document.addEventListener('DOMContentLoaded', function() {
+        const placeOrderBtn = document.getElementById('place-order-btn');
+        if (!placeOrderBtn) {
+            console.error('[Checkout] ERROR: place-order-btn not found!');
             return;
         }
+        console.log('[Checkout] Button found, attaching click handler');
+        
+        placeOrderBtn.addEventListener('click', async function() {
+            const btn = this;
+            const errorDiv = document.getElementById('checkout-error');
+            errorDiv.style.display = 'none';
 
-        // Validate phone number (PH format)
-        if (!/^9\d{9}$/.test(phone.replace(/\s/g, ''))) {
-            document.getElementById('error-message').textContent = "Please enter a valid Philippine mobile number (9XX XXX XXXX).";
-            errorDiv.style.display = 'block';
-            return;
-        }
+            // Validation
+            const fname = document.getElementById('fname').value.trim();
+            const lname = document.getElementById('lname').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const barangay = document.getElementById('barangay').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const province = document.getElementById('province').value;
+            const zip = document.getElementById('zip').value.trim();
+            const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
 
-        btn.innerHTML = '<i class="ph-bold ph-spinner" style="animation: spin 1s infinite linear;"></i> Processing...';
-        btn.disabled = true;
-
-        try {
-            await syncCart();
-
-            const fullAddress = `${address}, Brgy. ${barangay}, ${city}, ${province} ${zip}`;
-            
-            const payload = {
-                CustomerName: fname + ' ' + lname,
-                CustomerEmail: email,
-                Phone: '+63' + phone.replace(/\s/g, ''),
-                ShippingAddress: fullAddress,
-                City: city,
-                State: province,
-                ZipCode: zip
-            };
-
-            const response = await fetch('/api/orders/checkout', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                document.getElementById('order-id-display').textContent = result.data.orderId;
-                document.getElementById('success-modal').style.display = 'flex';
-                localStorage.removeItem("checkedProducts");
-                window.dispatchEvent(new Event('cartUpdated'));
-            } else {
-                throw new Error(result.message || 'Order failed');
+            if (!fname || !lname || !email || !phone || !address || !barangay || !city || !province || !zip) {
+                document.getElementById('error-message').textContent = "Please fill in all required fields.";
+                errorDiv.style.display = 'block';
+                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
             }
 
-        } catch (error) {
-            console.error(error);
-            document.getElementById('error-message').textContent = "Order failed: " + error.message;
-            errorDiv.style.display = 'block';
-            btn.innerHTML = '<i class="ph-bold ph-check-circle" style="margin-right: 0.5rem;"></i> Place Order';
-            btn.disabled = false;
-        }
+            // Validate phone number (PH format)
+            if (!/^9\d{9}$/.test(phone.replace(/\s/g, ''))) {
+                document.getElementById('error-message').textContent = "Please enter a valid Philippine mobile number (9XX XXX XXXX).";
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            btn.innerHTML = '<i class="ph-bold ph-spinner" style="animation: spin 1s infinite linear;"></i> Processing...';
+            btn.disabled = true;
+
+            try {
+                console.log('[Checkout] Step 1: Starting checkout process...');
+                console.log('[Checkout] Step 2: Syncing cart to backend...');
+                await syncCart();
+                console.log('[Checkout] Step 3: Cart synced successfully');
+
+                const fullAddress = `${address}, Brgy. ${barangay}, ${city}, ${province} ${zip}`;
+                
+                const payload = {
+                    CustomerName: fname + ' ' + lname,
+                    CustomerEmail: email,
+                    Phone: '+63' + phone.replace(/\s/g, ''),
+                    ShippingAddress: fullAddress,
+                    City: city,
+                    State: province,
+                    ZipCode: zip
+                };
+                console.log('[Checkout] Step 4: Payload prepared:', payload);
+
+                console.log('[Checkout] Step 5: Calling /api/orders/checkout...');
+                const response = await fetch('/api/orders/checkout', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                console.log('[Checkout] Step 6: Response received, status:', response.status);
+
+                const result = await response.json();
+                console.log('[Checkout] Step 7: API result:', result);
+
+                if (result.success) {
+                    console.log('[Checkout] SUCCESS! Order ID:', result.data.orderId);
+                    document.getElementById('order-id-display').textContent = result.data.orderId;
+                    document.getElementById('success-modal').style.display = 'flex';
+                    localStorage.removeItem("checkedProducts");
+                    window.dispatchEvent(new Event('cartUpdated'));
+                } else {
+                    console.log('[Checkout] FAILED: API returned success=false');
+                    throw new Error(result.message || 'Order failed');
+                }
+
+            } catch (error) {
+                console.error('Checkout error:', error);
+                let errorMsg = error.message || 'An unexpected error occurred';
+                
+                // Provide more helpful error messages
+                if (errorMsg.toLowerCase().includes('cart is empty')) {
+                    errorMsg = 'Your cart appears to be empty. Please add items to your cart and try again.';
+                } else if (errorMsg.toLowerCase().includes('failed to fetch')) {
+                    errorMsg = 'Network error. Please check your internet connection and try again.';
+                }
+                
+                document.getElementById('error-message').textContent = errorMsg;
+                errorDiv.style.display = 'block';
+                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                btn.innerHTML = '<i class="ph-bold ph-check-circle" style="margin-right: 0.5rem;"></i> Place Order';
+                btn.disabled = false;
+            }
+        });
     });
 
     window.finishCheckout = function() {
