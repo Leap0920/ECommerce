@@ -73,6 +73,7 @@ CREATE TABLE orders (
     user_id INT,
     customer_name VARCHAR(200) NOT NULL,
     customer_email VARCHAR(255) NOT NULL,
+    phone VARCHAR(20) NULL,
     shipping_address TEXT NOT NULL,
     city VARCHAR(100) NOT NULL,
     state VARCHAR(100) NOT NULL,

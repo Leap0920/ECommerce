@@ -95,7 +95,13 @@
         @RenderBody()
     </div>
 
-    <!-- Footer -->
+    <!-- Footer (hidden on Admin pages) -->
+    @{
+        var currentController = (ViewContext.RouteData.Values["controller"] ?? "").ToString();
+        var isAdminPage = currentController.Equals("Admin", StringComparison.OrdinalIgnoreCase) || Request.Url.AbsolutePath.ToLower().Contains("/admin");
+    }
+    @if(!isAdminPage)
+    {
     <footer style="background: linear-gradient(180deg, var(--bg-alt) 0%, #ffffff 100%); border-top: 1px solid var(--border); padding: 3rem 0; margin-top: 4rem; position: relative; overflow: hidden;">
         <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-primary);"></div>
         <div class="container">
@@ -129,6 +135,7 @@
             </div>
         </div>
     </footer>
+    }
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")

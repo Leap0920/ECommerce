@@ -125,7 +125,7 @@ namespace ECommerce.Controllers.Api
                 }
 
                 var subtotal = cartItems.Sum(c => c.TotalPrice);
-                var tax = subtotal * 0.08m; // 8% tax
+                var tax = subtotal * 0.12m; // 12% VAT
                 var total = subtotal + tax;
 
                 var order = new Order
@@ -133,6 +133,7 @@ namespace ECommerce.Controllers.Api
                     UserId = GetCurrentUserId(),
                     CustomerName = request.CustomerName,
                     CustomerEmail = request.CustomerEmail,
+                    Phone = request.Phone,
                     ShippingAddress = request.ShippingAddress,
                     City = request.City,
                     State = request.State,
@@ -229,6 +230,7 @@ namespace ECommerce.Controllers.Api
     {
         public string CustomerName { get; set; }
         public string CustomerEmail { get; set; }
+        public string Phone { get; set; }
         public string ShippingAddress { get; set; }
         public string City { get; set; }
         public string State { get; set; }

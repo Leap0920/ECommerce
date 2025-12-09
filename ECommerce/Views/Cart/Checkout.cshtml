@@ -172,8 +172,8 @@
         </div>
 
         <!-- Order Summary Sidebar -->
-        <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-            <div class="card" style="padding: 2rem; position: sticky; top: 100px;">
+        <div style="position: sticky; top: 100px; display: flex; flex-direction: column; gap: 1.5rem; align-self: flex-start;">
+            <div class="card" style="padding: 2rem;">
                 <h3 style="margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
                     <i class="ph ph-shopping-bag" style="color: var(--primary);"></i>
                     Order Summary
@@ -246,8 +246,8 @@
             </p>
         </div>
         <div style="display: flex; gap: 1rem;">
-            <a href="@Url.Action("Orders", "Customer")" class="btn btn-outline" style="flex: 1;">View Orders</a>
-            <a href="@Url.Action("Index", "Home")" class="btn btn-primary vue-btn" onclick="finishCheckout()" style="flex: 1;" data-vue-btn="checkout-continue">Continue Shopping</a>
+            <a href="@Url.Action("Dashboard", "Customer")" class="btn btn-outline" style="flex: 1;">Go to Dashboard</a>
+            <a href="@Url.Action("Orders", "Customer")" class="btn btn-primary vue-btn" onclick="finishCheckout()" style="flex: 1;" data-vue-btn="checkout-continue">View My Orders</a>
         </div>
     </div>
 </div>
@@ -393,6 +393,7 @@
             const payload = {
                 CustomerName: fname + ' ' + lname,
                 CustomerEmail: email,
+                Phone: '+63' + phone.replace(/\s/g, ''),
                 ShippingAddress: fullAddress,
                 City: city,
                 State: province,

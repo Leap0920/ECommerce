@@ -15,7 +15,7 @@ namespace ECommerce.Repositories
             {
                 const string sql = @"
                     SELECT id as Id, user_id as UserId, customer_name as CustomerName, 
-                           customer_email as CustomerEmail, shipping_address as ShippingAddress,
+                           customer_email as CustomerEmail, phone as Phone, shipping_address as ShippingAddress,
                            city as City, state as State, zip_code as ZipCode,
                            subtotal as Subtotal, tax as Tax, total as Total,
                            status as Status, order_date as OrderDate 
@@ -40,7 +40,7 @@ namespace ECommerce.Repositories
             {
                 const string sql = @"
                     SELECT id as Id, user_id as UserId, customer_name as CustomerName, 
-                           customer_email as CustomerEmail, shipping_address as ShippingAddress,
+                           customer_email as CustomerEmail, phone as Phone, shipping_address as ShippingAddress,
                            city as City, state as State, zip_code as ZipCode,
                            subtotal as Subtotal, tax as Tax, total as Total,
                            status as Status, order_date as OrderDate 
@@ -64,7 +64,7 @@ namespace ECommerce.Repositories
             {
                 const string sql = @"
                     SELECT id as Id, user_id as UserId, customer_name as CustomerName, 
-                           customer_email as CustomerEmail, shipping_address as ShippingAddress,
+                           customer_email as CustomerEmail, phone as Phone, shipping_address as ShippingAddress,
                            city as City, state as State, zip_code as ZipCode,
                            subtotal as Subtotal, tax as Tax, total as Total,
                            status as Status, order_date as OrderDate 
@@ -104,10 +104,10 @@ namespace ECommerce.Repositories
 
                         // Insert order
                         const string orderSql = @"
-                            INSERT INTO orders (id, user_id, customer_name, customer_email, 
+                            INSERT INTO orders (id, user_id, customer_name, customer_email, phone,
                                               shipping_address, city, state, zip_code,
                                               subtotal, tax, total, status, order_date) 
-                            VALUES (@Id, @UserId, @CustomerName, @CustomerEmail, 
+                            VALUES (@Id, @UserId, @CustomerName, @CustomerEmail, @Phone,
                                    @ShippingAddress, @City, @State, @ZipCode,
                                    @Subtotal, @Tax, @Total, @Status, @OrderDate)";
 
@@ -117,6 +117,7 @@ namespace ECommerce.Repositories
                             order.UserId,
                             order.CustomerName,
                             order.CustomerEmail,
+                            order.Phone,
                             order.ShippingAddress,
                             order.City,
                             order.State,
@@ -207,7 +208,7 @@ namespace ECommerce.Repositories
             {
                 const string sql = @"
                     SELECT id as Id, user_id as UserId, customer_name as CustomerName, 
-                           customer_email as CustomerEmail, shipping_address as ShippingAddress,
+                           customer_email as CustomerEmail, phone as Phone, shipping_address as ShippingAddress,
                            city as City, state as State, zip_code as ZipCode,
                            subtotal as Subtotal, tax as Tax, total as Total,
                            status as Status, order_date as OrderDate 
