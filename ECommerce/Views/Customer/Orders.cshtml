@@ -67,12 +67,7 @@
     <div class="card" style="width: 600px; padding: 2rem; max-height: 90vh; overflow-y: auto;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
             <h2><i class="ph ph-file-text" style="margin-right: 0.5rem;"></i> Invoice</h2>
-            <div style="display: flex; gap: 0.5rem;">
-                <button onclick="printInvoice()" class="btn btn-outline" style="font-size: 0.875rem;">
-                    <i class="ph ph-printer" style="margin-right: 0.25rem;"></i> Print
-                </button>
-                <button onclick="closeInvoiceModal()" class="icon-btn"><i class="ph ph-x"></i></button>
-            </div>
+            <button onclick="closeInvoiceModal()" class="icon-btn"><i class="ph ph-x"></i></button>
         </div>
         <div id="invoice-content">
             <!-- Invoice content will be loaded here -->
@@ -93,13 +88,6 @@
     }
     .star-btn:hover i, .star-btn i.active {
         color: #f59e0b !important;
-    }
-    @@media print {
-        body * { visibility: hidden; }
-        #invoice-content, #invoice-content * { visibility: visible; }
-        #invoice-content { position: absolute; left: 0; top: 0; width: 100%; }
-        #invoice-modal { display: block !important; position: static !important; background: white !important; }
-        #invoice-modal > div { box-shadow: none !important; max-height: none !important; }
     }
 </style>
 
@@ -438,10 +426,6 @@
     
     function closeInvoiceModal() {
         document.getElementById('invoice-modal').style.display = 'none';
-    }
-    
-    function printInvoice() {
-        window.print();
     }
     
     // Close modals when clicking outside
