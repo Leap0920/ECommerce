@@ -42,10 +42,43 @@ namespace ECommerce.Controllers.Api
             try
             {
                 var orders = _orderRepository.GetAll();
-                return Json(new { success = true, data = orders }, JsonRequestBehavior.AllowGet);
+                
+                // Map to anonymous objects to ensure proper JSON serialization
+                var result = orders.Select(o => new
+                {
+                    o.Id,
+                    o.UserId,
+                    o.CustomerName,
+                    o.CustomerEmail,
+                    o.Phone,
+                    o.ShippingAddress,
+                    o.City,
+                    o.State,
+                    o.ZipCode,
+                    o.Subtotal,
+                    o.Tax,
+                    o.Total,
+                    o.Status,
+                    OrderDate = o.OrderDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    Items = o.Items?.Select(i => new
+                    {
+                        i.Id,
+                        OrderId = i.OrderId ?? o.Id,
+                        i.ProductId,
+                        i.ProductName,
+                        i.ProductImage,
+                        i.Price,
+                        i.Quantity,
+                        i.TotalPrice,
+                        i.Type
+                    }).ToList()
+                }).ToList();
+                
+                return Json(new { success = true, data = result }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"GetAll Error: {ex.Message} | {ex.StackTrace}");
                 return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
@@ -82,7 +115,39 @@ namespace ECommerce.Controllers.Api
                 }
 
                 var orders = _orderRepository.GetByUserId(userId.Value);
-                return Json(new { success = true, data = orders }, JsonRequestBehavior.AllowGet);
+                
+                // Map to anonymous objects for proper JSON serialization
+                var result = orders.Select(o => new
+                {
+                    o.Id,
+                    o.UserId,
+                    o.CustomerName,
+                    o.CustomerEmail,
+                    o.Phone,
+                    o.ShippingAddress,
+                    o.City,
+                    o.State,
+                    o.ZipCode,
+                    o.Subtotal,
+                    o.Tax,
+                    o.Total,
+                    o.Status,
+                    OrderDate = o.OrderDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    Items = o.Items?.Select(i => new
+                    {
+                        i.Id,
+                        OrderId = i.OrderId ?? o.Id,
+                        i.ProductId,
+                        i.ProductName,
+                        i.ProductImage,
+                        i.Price,
+                        i.Quantity,
+                        i.TotalPrice,
+                        i.Type
+                    }).ToList()
+                }).ToList();
+                
+                return Json(new { success = true, data = result }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {
@@ -97,7 +162,39 @@ namespace ECommerce.Controllers.Api
             try
             {
                 var orders = _orderRepository.GetRecentOrders(count);
-                return Json(new { success = true, data = orders }, JsonRequestBehavior.AllowGet);
+                
+                // Map to anonymous objects for proper JSON serialization
+                var result = orders.Select(o => new
+                {
+                    o.Id,
+                    o.UserId,
+                    o.CustomerName,
+                    o.CustomerEmail,
+                    o.Phone,
+                    o.ShippingAddress,
+                    o.City,
+                    o.State,
+                    o.ZipCode,
+                    o.Subtotal,
+                    o.Tax,
+                    o.Total,
+                    o.Status,
+                    OrderDate = o.OrderDate.ToString("yyyy-MM-ddTHH:mm:ss"),
+                    Items = o.Items?.Select(i => new
+                    {
+                        i.Id,
+                        OrderId = i.OrderId ?? o.Id,
+                        i.ProductId,
+                        i.ProductName,
+                        i.ProductImage,
+                        i.Price,
+                        i.Quantity,
+                        i.TotalPrice,
+                        i.Type
+                    }).ToList()
+                }).ToList();
+                
+                return Json(new { success = true, data = result }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {

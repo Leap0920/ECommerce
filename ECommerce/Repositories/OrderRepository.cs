@@ -216,7 +216,15 @@ namespace ECommerce.Repositories
                     ORDER BY order_date DESC
                     LIMIT @Count";
                 
-                return connection.Query<Order>(sql, new { Count = count }).ToList();
+                var orders = connection.Query<Order>(sql, new { Count = count }).ToList();
+                
+                // Load order items for each order
+                foreach (var order in orders)
+                {
+                    order.Items = GetOrderItems(order.Id);
+                }
+                
+                return orders;
             }
         }
 
@@ -225,12 +233,20 @@ namespace ECommerce.Repositories
             using (var connection = DatabaseConfig.GetConnection())
             {
                 const string sql = @"
-                    SELECT id as Id, order_id as OrderId, product_id as ProductId,
+                    SELECT id as Id, product_id as ProductId,
                            product_name as ProductName, product_image as ProductImage,
                            price as Price, quantity as Quantity, total_price as TotalPrice, type as Type
                     FROM order_items 
                     WHERE order_id = @OrderId";
-                return connection.Query<OrderItem>(sql, new { OrderId = orderId }).ToList();
+                var items = connection.Query<OrderItem>(sql, new { OrderId = orderId }).ToList();
+                
+                // Set OrderId manually since it's a string and Dapper might have issues
+                foreach (var item in items)
+                {
+                    item.OrderId = orderId;
+                }
+                
+                return items;
             }
         }
     }
