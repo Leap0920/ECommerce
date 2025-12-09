@@ -26,7 +26,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
                         <div>
                             <p style="font-size: 0.9rem; margin-bottom: 0.25rem; color: var(--text-muted);">Total Sales</p>
-                            <h3 id="stat-sales" style="font-size: 1.75rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">₱0.00</h3>
+                            <h3 id="stat-sales" style="font-size: 1.75rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">&#8369;0.00</h3>
                         </div>
                         <div style="padding: 0.75rem; background: var(--gradient-light); border-radius: 50%; box-shadow: 0 4px 15px rgba(45, 106, 79, 0.2);">
                             <i class="ph-bold ph-currency-dollar" style="color: var(--primary); font-size: 1.25rem;"></i>
@@ -109,7 +109,7 @@
             
             if (result.success) {
                 document.getElementById("stat-orders").textContent = result.data.totalOrders;
-                document.getElementById("stat-sales").textContent = `₱${result.data.totalSales.toFixed(2)}`;
+                document.getElementById("stat-sales").textContent = `\u20B1${result.data.totalSales.toFixed(2)}`;
             }
         } catch (error) {
             console.error('Error loading stats:', error);
@@ -176,7 +176,7 @@
                         <td style="padding: 1rem 0;">
                             <span style="${statusColors[order.Status] || ''} padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.85rem; font-weight: 500;">${order.Status}</span>
                         </td>
-                        <td style="padding: 1rem 0; text-align: right; font-weight: 600;">₱${order.Total.toFixed(2)}</td>
+                        <td style="padding: 1rem 0; text-align: right; font-weight: 600;">\u20B1${order.Total.toFixed(2)}</td>
                     `;
                     tbody.appendChild(tr);
                 });

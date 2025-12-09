@@ -186,22 +186,22 @@
 
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
                     <span style="color: var(--text-muted);">Subtotal</span>
-                    <span id="chk-subtotal" style="font-weight: 600;">₱0.00</span>
+                    <span id="chk-subtotal" style="font-weight: 600;">&#8369;0.00</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
                     <span style="color: var(--text-muted);">Shipping Fee</span>
-                    <span id="chk-shipping" style="font-weight: 600;">₱0.00</span>
+                    <span id="chk-shipping" style="font-weight: 600;">&#8369;0.00</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem;">
                     <span style="color: var(--text-muted);">VAT (12%)</span>
-                    <span id="chk-tax" style="font-weight: 600;">₱0.00</span>
+                    <span id="chk-tax" style="font-weight: 600;">&#8369;0.00</span>
                 </div>
                 
                 <div style="height: 1px; background: var(--border); margin: 1rem 0;"></div>
                 
                 <div style="display: flex; justify-content: space-between; font-size: 1.25rem; font-weight: 700;">
                     <span>Total</span>
-                    <span id="chk-total" style="color: var(--primary);">₱0.00</span>
+                    <span id="chk-total" style="color: var(--primary);">&#8369;0.00</span>
                 </div>
 
                 <button id="place-order-btn" class="btn btn-primary vue-btn" style="width: 100%; margin-top: 1.5rem; padding: 1rem; font-size: 1rem;" data-vue-btn="checkout-place-order">
@@ -221,7 +221,7 @@
                     <span style="font-weight: 600; color: #166534;">Free Shipping</span>
                 </div>
                 <p style="font-size: 0.8rem; color: #166534; margin: 0;">
-                    Orders above ₱1,500 qualify for FREE shipping within Metro Manila!
+                    Orders above &#8369;1,500 qualify for FREE shipping within Metro Manila!
                 </p>
             </div>
         </div>
@@ -330,10 +330,10 @@
                     </div>
                     <div>
                         <span style="font-size: 0.875rem; font-weight: 500;">${item.name}</span>
-                        <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">₱${item.price.toFixed(2)} each</p>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0;">\u20B1${item.price.toFixed(2)} each</p>
                     </div>
                 </div>
-                <span style="font-weight: 600; font-size: 0.9rem;">₱${item.totalPrice.toFixed(2)}</span>
+                <span style="font-weight: 600; font-size: 0.9rem;">\u20B1${item.totalPrice.toFixed(2)}</span>
             `;
             itemsContainer.appendChild(div);
         });
@@ -343,11 +343,11 @@
         const tax = subtotal * 0.12; // 12% VAT
         const total = subtotal + actualShipping + tax;
 
-        document.getElementById('chk-subtotal').textContent = `₱${subtotal.toFixed(2)}`;
-        document.getElementById('chk-shipping').textContent = actualShipping === 0 ? 'FREE' : `₱${actualShipping.toFixed(2)}`;
+        document.getElementById('chk-subtotal').textContent = `\u20B1${subtotal.toFixed(2)}`;
+        document.getElementById('chk-shipping').textContent = actualShipping === 0 ? 'FREE' : `\u20B1${actualShipping.toFixed(2)}`;
         document.getElementById('chk-shipping').style.color = actualShipping === 0 ? '#166534' : '';
-        document.getElementById('chk-tax').textContent = `₱${tax.toFixed(2)}`;
-        document.getElementById('chk-total').textContent = `₱${total.toFixed(2)}`;
+        document.getElementById('chk-tax').textContent = `\u20B1${tax.toFixed(2)}`;
+        document.getElementById('chk-total').textContent = `\u20B1${total.toFixed(2)}`;
     }
 
     // Place Order Logic

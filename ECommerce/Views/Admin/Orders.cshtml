@@ -88,7 +88,7 @@
                             ${order.Status}
                         </span>
                     </td>
-                    <td style="padding: 1rem 0; text-align: right; font-weight: 600;">₱${order.Total.toFixed(2)}</td>
+                    <td style="padding: 1rem 0; text-align: right; font-weight: 600;">\u20B1${order.Total.toFixed(2)}</td>
                     <td style="padding: 1rem 0; text-align: right;">
                         <select onchange="updateStatus('${order.Id}', this.value)" style="padding: 0.25rem; border-radius: 0.25rem; border: 1px solid var(--border);">
                             <option value="Pending" ${order.Status === 'Pending' ? 'selected' : ''}>Pending</option>

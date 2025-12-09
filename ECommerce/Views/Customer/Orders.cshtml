@@ -204,7 +204,7 @@
                                 </div>
                                 <div>
                                     <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem;">${item.ProductName}</h3>
-                                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Qty: ${item.Quantity} × ₱${item.Price.toFixed(2)}</p>
+                                    <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem;">Qty: ${item.Quantity} × \u20B1${item.Price.toFixed(2)}</p>
                                     <span style="${statusColors[order.Status] || ''} padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.85rem; font-weight: 600;">${deliveryText}</span>
                                 </div>
                             </div>
@@ -233,7 +233,7 @@
                         </div>
                         <div>
                             <p style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem;">Total</p>
-                            <span style="font-weight: 600;">₱${order.Total.toFixed(2)}</span>
+                            <span style="font-weight: 600;">\u20B1${order.Total.toFixed(2)}</span>
                         </div>
                         <div>
                             <p style="font-size: 0.85rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.25rem;">Ship To</p>
@@ -360,8 +360,8 @@
                     <tr style="${index < order.Items.length - 1 ? 'border-bottom: 1px solid var(--border);' : ''}">
                         <td style="padding: 0.75rem 0;">${item.ProductName}</td>
                         <td style="padding: 0.75rem 0; text-align: center;">${item.Quantity}</td>
-                        <td style="padding: 0.75rem 0; text-align: right;">₱${item.Price.toFixed(2)}</td>
-                        <td style="padding: 0.75rem 0; text-align: right; font-weight: 600;">₱${item.TotalPrice.toFixed(2)}</td>
+                        <td style="padding: 0.75rem 0; text-align: right;">\u20B1${item.Price.toFixed(2)}</td>
+                        <td style="padding: 0.75rem 0; text-align: right; font-weight: 600;">\u20B1${item.TotalPrice.toFixed(2)}</td>
                     </tr>
                 `;
             });
@@ -419,15 +419,15 @@
                     <div style="width: 250px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                             <span style="color: var(--text-muted);">Subtotal</span>
-                            <span>₱${order.Subtotal.toFixed(2)}</span>
+                            <span>\u20B1${order.Subtotal.toFixed(2)}</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
                             <span style="color: var(--text-muted);">VAT (12%)</span>
-                            <span>₱${order.Tax.toFixed(2)}</span>
+                            <span>\u20B1${order.Tax.toFixed(2)}</span>
                         </div>
                         <div style="display: flex; justify-content: space-between; padding-top: 0.75rem; border-top: 2px solid var(--border); font-weight: 700; font-size: 1.1rem;">
                             <span>Total</span>
-                            <span style="color: var(--primary);">₱${order.Total.toFixed(2)}</span>
+                            <span style="color: var(--primary);">\u20B1${order.Total.toFixed(2)}</span>
                         </div>
                     </div>
                 </div>

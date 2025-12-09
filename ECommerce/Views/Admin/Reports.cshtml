@@ -24,7 +24,7 @@
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
             <div class="card" style="padding: 1.5rem;">
                 <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Total Revenue</p>
-                <h2 id="metric-revenue" style="font-size: 2rem; color: var(--primary); margin-bottom: 0.25rem;">₱0.00</h2>
+                <h2 id="metric-revenue" style="font-size: 2rem; color: var(--primary); margin-bottom: 0.25rem;">&#8369;0.00</h2>
                 <span id="revenue-change" style="color: var(--success); font-size: 0.875rem; font-weight: 600;">
                     <i class="ph ph-arrow-up"></i> 0% from last period
                 </span>
@@ -38,7 +38,7 @@
             </div>
             <div class="card" style="padding: 1.5rem;">
                 <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Avg Order Value</p>
-                <h2 id="metric-avg" style="font-size: 2rem; color: var(--primary); margin-bottom: 0.25rem;">₱0.00</h2>
+                <h2 id="metric-avg" style="font-size: 2rem; color: var(--primary); margin-bottom: 0.25rem;">&#8369;0.00</h2>
                 <span id="avg-change" style="color: var(--success); font-size: 0.875rem; font-weight: 600;">
                     <i class="ph ph-arrow-up"></i> 0% from last period
                 </span>
@@ -152,9 +152,9 @@
         const avgChange = prevAvg > 0 ? ((currentAvg - prevAvg) / prevAvg * 100).toFixed(1) : 0;
         
         // Update UI
-        document.getElementById('metric-revenue').textContent = `₱${currentRevenue.toFixed(2)}`;
+        document.getElementById('metric-revenue').textContent = `\u20B1${currentRevenue.toFixed(2)}`;
         document.getElementById('metric-orders').textContent = currentOrderCount;
-        document.getElementById('metric-avg').textContent = `₱${currentAvg.toFixed(2)}`;
+        document.getElementById('metric-avg').textContent = `\u20B1${currentAvg.toFixed(2)}`;
         
         updateChangeIndicator('revenue-change', revenueChange);
         updateChangeIndicator('orders-change', ordersChange);
@@ -228,7 +228,7 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Revenue (₱)',
+                    label: 'Revenue (\u20B1)',
                     data: data,
                     borderColor: '#2d6a4f',
                     backgroundColor: 'rgba(45, 106, 79, 0.1)',
@@ -261,7 +261,7 @@
                         },
                         callbacks: {
                             label: function(context) {
-                                return `Revenue: ₱${context.parsed.y.toFixed(2)}`;
+                                return `Revenue: \u20B1${context.parsed.y.toFixed(2)}`;
                             }
                         }
                     }
@@ -279,7 +279,7 @@
                         },
                         ticks: {
                             callback: function(value) {
-                                return '₱' + value;
+                                return '\u20B1' + value;
                             }
                         }
                     }
@@ -339,7 +339,7 @@
             tr.innerHTML = `
                 <td style="padding: 1rem 0; font-weight: 600;">${product.name}</td>
                 <td style="padding: 1rem 0;">${product.quantity} units</td>
-                <td style="padding: 1rem 0;">₱${product.revenue.toFixed(2)}</td>
+                <td style="padding: 1rem 0;">\u20B1${product.revenue.toFixed(2)}</td>
                 <td style="padding: 1rem 0;">
                     <span style="color: var(--${isPositive ? 'success' : 'error'});">
                         <i class="ph ph-arrow-${isPositive ? 'up' : 'down'}"></i> ${Math.abs(trend)}%

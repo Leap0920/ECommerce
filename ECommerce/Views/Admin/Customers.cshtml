@@ -175,7 +175,7 @@
                 <td style="padding: 1rem 0;">
                     <span style="font-weight: 600;">${orderStats.count}</span> orders
                 </td>
-                <td style="padding: 1rem 0; font-weight: 600; color: var(--primary);">₱${orderStats.total.toFixed(2)}</td>
+                <td style="padding: 1rem 0; font-weight: 600; color: var(--primary);">\u20B1${orderStats.total.toFixed(2)}</td>
                 <td style="padding: 1rem 0;">
                     <span style="${customer.IsActive ? 'background: #dcfce7; color: #166534;' : 'background: #fee2e2; color: #991b1b;'} padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.85rem; font-weight: 500;">
                         ${customer.IsActive ? 'Active' : 'Inactive'}
@@ -238,7 +238,7 @@
                 </div>
                 <div class="card" style="padding: 1rem; text-align: center;">
                     <p style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Total Spent</p>
-                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">₱${orderStats.total.toFixed(2)}</p>
+                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">\u20B1${orderStats.total.toFixed(2)}</p>
                 </div>
             </div>
             
