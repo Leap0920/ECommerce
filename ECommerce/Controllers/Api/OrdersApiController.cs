@@ -10,11 +10,13 @@ namespace ECommerce.Controllers.Api
     {
         private readonly IOrderRepository _orderRepository;
         private readonly ICartRepository _cartRepository;
+        private readonly IProductRepository _productRepository;
 
         public OrdersApiController()
         {
             _orderRepository = new OrderRepository();
             _cartRepository = new CartRepository();
+            _productRepository = new ProductRepository();
         }
 
         private string GetSessionId()
@@ -237,9 +239,16 @@ namespace ECommerce.Controllers.Api
                 var sessionId = GetSessionId();
                 
                 // Get cart items - use user_id for logged-in users, session_id for guests
+                System.Diagnostics.Debug.WriteLine($"[Checkout] Getting cart items for UserId: {userId}, SessionId: {sessionId}");
                 var cartItems = userId.HasValue
                     ? _cartRepository.GetByUserId(userId.Value)
                     : _cartRepository.GetBySessionId(sessionId);
+
+                System.Diagnostics.Debug.WriteLine($"[Checkout] Found {cartItems.Count()} cart items");
+                foreach (var ci in cartItems)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[Checkout] Cart Item - ProductId: {ci.ProductId}, Name: {ci.ProductName}, Qty: {ci.Quantity}");
+                }
 
                 if (!cartItems.Any())
                 {
@@ -277,6 +286,28 @@ namespace ECommerce.Controllers.Api
                 };
 
                 var createdOrder = _orderRepository.Create(order);
+                System.Diagnostics.Debug.WriteLine($"[Checkout] Order created: {createdOrder.Id}");
+
+                // Update stock for each product in the order
+                var itemsList = cartItems.ToList();
+                System.Diagnostics.Debug.WriteLine($"[Checkout] Updating stock for {itemsList.Count} items");
+                foreach (var item in itemsList)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[Checkout] Updating stock - ProductId: {item.ProductId}, Quantity: {item.Quantity}, ProductName: {item.ProductName}");
+                    try
+                    {
+                        var stockUpdated = _productRepository.UpdateStock(item.ProductId, item.Quantity);
+                        System.Diagnostics.Debug.WriteLine($"[Checkout] Stock update result for ProductId {item.ProductId}: {stockUpdated}");
+                        if (!stockUpdated)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"[Checkout] WARNING: Stock update returned false for ProductId {item.ProductId}. Product may not exist or insufficient stock.");
+                        }
+                    }
+                    catch (Exception stockEx)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"[Checkout] ERROR updating stock for ProductId {item.ProductId}: {stockEx.Message}");
+                    }
+                }
 
                 // Clear the cart after successful order - use user_id for logged-in users
                 if (userId.HasValue)

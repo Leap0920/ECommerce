@@ -8,7 +8,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
                 <h1 style="font-size: 1.75rem; margin-bottom: 0.5rem;" id="welcome-name">Welcome back!</h1>
-                <p style="opacity: 0.9;" id="user-email">Loading...</p>
+                <p style="color: rgba(255,255,255,0.85); font-size: 0.95rem;" id="user-email">Loading...</p>
             </div>
             <div style="display: flex; align-items: center; gap: 1rem;">
                 <a href="@Url.Action("Orders", "Customer")" class="btn" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.3);">
@@ -134,7 +134,7 @@
                     html += '<tr style="border-bottom: 1px solid var(--border);">';
                     html += '<td style="padding: 1rem 0; font-family: monospace;">' + order.Id + '</td>';
                     html += '<td style="padding: 1rem 0;">' + date + '</td>';
-                    html += '<td style="padding: 1rem 0; font-weight: 600;">₱' + order.Total.toFixed(2) + '</td>';
+                    html += '<td style="padding: 1rem 0; font-weight: 600;">&#8369;' + order.Total.toFixed(2) + '</td>';
                     html += '<td style="padding: 1rem 0;"><span style="' + (statusColors[order.Status] || '') + ' padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.85rem; font-weight: 500;">' + order.Status + '</span></td>';
                     html += '</tr>';
                 });

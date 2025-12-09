@@ -150,11 +150,31 @@ namespace ECommerce.Repositories
         {
             using (var connection = DatabaseConfig.GetConnection())
             {
+                connection.Open();
+                
+                // First, check current stock
+                const string checkSql = "SELECT stock_quantity FROM products WHERE id = @ProductId";
+                var currentStock = connection.ExecuteScalar<int?>(checkSql, new { ProductId = productId });
+                System.Diagnostics.Debug.WriteLine($"[UpdateStock] ProductId={productId}, CurrentStock={currentStock}, RequestedQty={quantity}");
+                
+                if (!currentStock.HasValue)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[UpdateStock] ERROR: Product {productId} not found!");
+                    return false;
+                }
+                
+                if (currentStock.Value < quantity)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[UpdateStock] WARNING: Insufficient stock for ProductId {productId}. Current: {currentStock.Value}, Requested: {quantity}. Updating anyway to prevent negative stock.");
+                }
+                
+                // Update stock - allow going to 0 but not negative
                 const string sql = @"
                     UPDATE products 
-                    SET stock_quantity = stock_quantity - @Quantity 
-                    WHERE id = @ProductId AND stock_quantity >= @Quantity";
+                    SET stock_quantity = GREATEST(0, stock_quantity - @Quantity)
+                    WHERE id = @ProductId";
                 var rowsAffected = connection.Execute(sql, new { ProductId = productId, Quantity = quantity });
+                System.Diagnostics.Debug.WriteLine($"[UpdateStock] ProductId={productId}, Quantity={quantity}, RowsAffected={rowsAffected}");
                 return rowsAffected > 0;
             }
         }
