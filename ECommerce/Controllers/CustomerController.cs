@@ -4,14 +4,20 @@ namespace ECommerce.Controllers
 {
     public class CustomerController : Controller
     {
-        // GET: Orders
-        public ActionResult Orders()
+        // GET: Customer Dashboard (redirects to Dashboard view)
+        public ActionResult Index()
+        {
+            return RedirectToAction("Dashboard");
+        }
+
+        // GET: Customer Dashboard
+        public ActionResult Dashboard()
         {
             return View();
         }
 
-        // GET: Customer list (for admin)
-        public ActionResult Index()
+        // GET: Customer Orders
+        public ActionResult Orders()
         {
             return View();
         }

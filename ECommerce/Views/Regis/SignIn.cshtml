@@ -13,11 +13,14 @@
             <p>Sign in to your account to continue</p>
         </div>
 
-        <form>
+        <!-- Error/Success Messages -->
+        <div id="message-container" style="display: none; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;"></div>
+
+        <form id="signin-form">
             <div class="form-group">
                 <label class="form-label">Email Address</label>
                 <div style="position: relative;">
-                    <input type="email" class="form-control" placeholder="name@example.com" style="padding-left: 2.5rem;">
+                    <input type="email" id="email" class="form-control" placeholder="name@example.com" style="padding-left: 2.5rem;" required>
                     <i class="ph ph-envelope" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
                 </div>
             </div>
@@ -28,17 +31,118 @@
                     <a href="#" style="font-size: 0.85rem; color: var(--primary); font-weight: 500;">Forgot password?</a>
                 </div>
                 <div style="position: relative;">
-                    <input type="password" class="form-control" placeholder="Enter your password" style="padding-left: 2.5rem;">
+                    <input type="password" id="password" class="form-control" placeholder="Enter your password" style="padding-left: 2.5rem;" required>
                     <i class="ph ph-lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary vue-btn" style="width: 100%; margin-top: 1rem;" data-vue-btn="signin-submit">Sign In</button>
+            <button type="submit" id="signin-btn" class="btn btn-primary vue-btn" style="width: 100%; margin-top: 1rem;" data-vue-btn="signin-submit">
+                <span id="btn-text">Sign In</span>
+                <span id="btn-loading" style="display: none;">
+                    <i class="ph ph-spinner" style="animation: spin 1s linear infinite;"></i> Signing in...
+                </span>
+            </button>
         </form>
 
         <div style="margin-top: 2rem; text-align: center; font-size: 0.9rem; color: var(--text-muted);">
             Don't have an account? <a href="@Url.Action("Register", "Regis")" style="color: var(--primary); font-weight: 600;">Sign up</a>
         </div>
+
+        <!-- Demo Accounts Info -->
+        <div style="margin-top: 2rem; padding: 1rem; background: #f0f9f4; border-radius: 8px; font-size: 0.85rem;">
+            <strong style="color: var(--primary);">Demo Accounts:</strong>
+            <div style="margin-top: 0.5rem; color: var(--text-muted);">
+                <div>Admin: <code>admin@ecommerce.com</code> / <code>Admin123!</code></div>
+                <div>Customer: <code>john.doe@email.com</code> / <code>Customer123!</code></div>
+            </div>
+        </div>
     </div>
 </div>
 
+<style>
+    @@keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>
+
+<script>
+    document.getElementById('signin-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const messageContainer = document.getElementById('message-container');
+        const btnText = document.getElementById('btn-text');
+        const btnLoading = document.getElementById('btn-loading');
+        const btn = document.getElementById('signin-btn');
+        
+        // Show loading
+        btnText.style.display = 'none';
+        btnLoading.style.display = 'inline';
+        btn.disabled = true;
+        messageContainer.style.display = 'none';
+        
+        try {
+            const response = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    Email: email,
+                    Password: password
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Show success message
+                messageContainer.style.display = 'block';
+                messageContainer.style.background = '#d4edda';
+                messageContainer.style.color = '#155724';
+                messageContainer.style.border = '1px solid #28a745';
+                messageContainer.innerHTML = '<i class="ph-fill ph-check-circle"></i> ' + result.message + ' Redirecting...';
+                
+                // Store user info in localStorage
+                localStorage.setItem('user', JSON.stringify(result.data));
+                
+                // Redirect based on role
+                setTimeout(() => {
+                    if (result.data.role === 'Admin') {
+                        window.location.href = '@Url.Action("Index", "Admin")';
+                    } else {
+                        window.location.href = '@Url.Action("Index", "Customer")';
+                    }
+                }, 1000);
+            } else {
+                // Show error message
+                messageContainer.style.display = 'block';
+                messageContainer.style.background = '#f8d7da';
+                messageContainer.style.color = '#721c24';
+                messageContainer.style.border = '1px solid #dc3545';
+                messageContainer.innerHTML = '<i class="ph-fill ph-warning-circle"></i> ' + result.message;
+                
+                // Reset button
+                btnText.style.display = 'inline';
+                btnLoading.style.display = 'none';
+                btn.disabled = false;
+            }
+        } catch (error) {
+            // Show error message
+            messageContainer.style.display = 'block';
+            messageContainer.style.background = '#f8d7da';
+            messageContainer.style.color = '#721c24';
+            messageContainer.style.border = '1px solid #dc3545';
+            messageContainer.innerHTML = '<i class="ph-fill ph-warning-circle"></i> Connection error. Please try again.';
+            
+            // Reset button
+            btnText.style.display = 'inline';
+            btnLoading.style.display = 'none';
+            btn.disabled = false;
+            
+            console.error('Login error:', error);
+        }
+    });
+</script>

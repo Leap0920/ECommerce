@@ -13,11 +13,13 @@
                 <h1 style="font-size: 2rem; margin-bottom: 0.5rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Orders</h1>
                 <p style="color: var(--text-muted);">Manage customer orders</p>
             </div>
+            <!--
             <div style="display: flex; gap: 1rem;">
-                <button class="btn btn-outline" onclick="clearOrders()">
+                <button class="btn btn-outline">
                     <i class="ph-bold ph-trash" style="margin-right: 0.5rem;"></i> Clear History
                 </button>
             </div>
+            -->
         </div>
 
         <div class="card" style="padding: 1.5rem;">
@@ -30,10 +32,11 @@
                         <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Items</th>
                         <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Status</th>
                         <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500; text-align: right;">Total</th>
+                        <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500; text-align: right;">Action</th>
                     </tr>
                 </thead>
                 <tbody id="orders-body">
-                    <!-- Injected via JS -->
+                    <tr><td colspan="7" style="padding: 3rem; text-align: center; color: var(--text-muted);">Loading orders...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -42,43 +45,81 @@
 
 <script>
     const tbody = document.getElementById("orders-body");
-    const orders = JSON.parse(localStorage.getItem("allOrders")) || [];
 
-    function renderOrders() {
-        tbody.innerHTML = "";
-        if (orders.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" style="padding: 3rem; text-align: center; color: var(--text-muted);">No orders found.</td></tr>`;
-            return;
+    async function loadOrders() {
+        try {
+            const response = await fetch('/api/orders');
+            const result = await response.json();
+            
+            tbody.innerHTML = "";
+            
+            if (!result.success || !result.data || result.data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="padding: 3rem; text-align: center; color: var(--text-muted);">No orders found.</td></tr>`;
+                return;
+            }
+
+            result.data.forEach(order => {
+                const date = new Date(order.OrderDate).toLocaleDateString();
+                const tr = document.createElement("tr");
+                tr.style.borderBottom = "1px solid var(--border)";
+                
+                const statusColors = {
+                    'Pending': 'background: #fef3c7; color: #92400e;',
+                    'Processing': 'background: #dbeafe; color: #1e40af;',
+                    'Shipped': 'background: #e0e7ff; color: #4338ca;',
+                    'Delivered': 'background: #dcfce7; color: #166534;',
+                    'Cancelled': 'background: #fee2e2; color: #991b1b;'
+                };
+                
+                tr.innerHTML = `
+                    <td style="padding: 1rem 0; font-weight: 600;">#${order.Id}</td>
+                    <td style="padding: 1rem 0;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="width: 32px; height: 32px; background: #e5e7eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+                                ${order.CustomerName.charAt(0)}
+                            </div>
+                            <span>${order.CustomerName}</span>
+                        </div>
+                    </td>
+                    <td style="padding: 1rem 0;">${date}</td>
+                    <td style="padding: 1rem 0;">${order.Items ? order.Items.length : 0} Items</td>
+                    <td style="padding: 1rem 0;">
+                        <span style="${statusColors[order.Status] || ''} padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.85rem; font-weight: 500;">
+                            ${order.Status}
+                        </span>
+                    </td>
+                    <td style="padding: 1rem 0; text-align: right; font-weight: 600;">₱${order.Total.toFixed(2)}</td>
+                    <td style="padding: 1rem 0; text-align: right;">
+                        <select onchange="updateStatus('${order.Id}', this.value)" style="padding: 0.25rem; border-radius: 0.25rem; border: 1px solid var(--border);">
+                            <option value="Pending" ${order.Status === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="Processing" ${order.Status === 'Processing' ? 'selected' : ''}>Processing</option>
+                            <option value="Shipped" ${order.Status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                            <option value="Delivered" ${order.Status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                            <option value="Cancelled" ${order.Status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                        </select>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } catch (error) {
+            console.error(error);
+            tbody.innerHTML = `<tr><td colspan="7" style="padding: 3rem; text-align: center; color: var(--text-muted);">Error loading orders.</td></tr>`;
         }
-
-        orders.forEach(order => {
-            const tr = document.createElement("tr");
-            tr.style.borderBottom = "1px solid var(--border)";
-            tr.innerHTML = `
-                <td style="padding: 1rem 0; font-weight: 600;">#${order.id}</td>
-                <td style="padding: 1rem 0;">
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <div style="width: 32px; height: 32px; background: #e5e7eb; border-radius: 50%;"></div>
-                        <span>${order.customer}</span>
-                    </div>
-                </td>
-                <td style="padding: 1rem 0;">${order.date}</td>
-                <td style="padding: 1rem 0;">${order.items.length} Items</td>
-                <td style="padding: 1rem 0;">
-                    <span style="background: #ffedd5; color: #9a3412; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.85rem; font-weight: 500;">${order.status}</span>
-                </td>
-                <td style="padding: 1rem 0; text-align: right; font-weight: 600;">$${order.total.toFixed(2)}</td>
-            `;
-            tbody.appendChild(tr);
-        });
     }
 
-    window.clearOrders = function() {
-        if(confirm("Clear all order history?")) {
-            localStorage.removeItem("allOrders");
-            location.reload();
+    async function updateStatus(orderId, status) {
+        try {
+            await fetch('/api/orders/status', {
+                method: 'POST',
+                // Using URLSearchParams for simple parameters binding
+                body: new URLSearchParams({ orderId: orderId, status: status })
+            });
+            // Optionally reload or show notification
+            // loadOrders(); 
+        } catch (e) {
+            alert('Failed to update status');
         }
-    };
+    }
 
-    renderOrders();
+    document.addEventListener('DOMContentLoaded', loadOrders);
 </script>

@@ -37,20 +37,20 @@
             <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
                 <div style="display: flex; justify-content: space-between;">
                     <span style="color: var(--text-muted);">Subtotal</span>
-                    <span id="summary-subtotal" style="font-weight: 600;">$0.00</span>
+                    <span id="summary-subtotal" style="font-weight: 600;">₱0.00</span>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
                     <span style="color: var(--text-muted);">Shipping</span>
                     <span style="font-weight: 600; color: var(--primary);">Free</span>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
-                    <span style="color: var(--text-muted);">Tax (5%)</span>
-                    <span id="summary-tax" style="font-weight: 600;">$0.00</span>
+                    <span style="color: var(--text-muted);">VAT (12%)</span>
+                    <span id="summary-tax" style="font-weight: 600;">₱0.00</span>
                 </div>
                 <div style="height: 1px; background: var(--border); margin: 0.5rem 0;"></div>
                 <div style="display: flex; justify-content: space-between; font-size: 1.25rem; font-weight: 700;">
                     <span>Total</span>
-                    <span id="summary-total">$0.00</span>
+                    <span id="summary-total">₱0.00</span>
                 </div>
             </div>
 
@@ -71,6 +71,42 @@
     const emptyMsg = document.getElementById('empty-cart-msg');
     let cart = JSON.parse(localStorage.getItem("checkedProducts")) || [];
 
+    // Sync with server if logged in
+    document.addEventListener('DOMContentLoaded', async () => {
+        try {
+            // First check if we have items on the server
+            const response = await fetch('/api/cart');
+            const result = await response.json();
+            
+            if (result.success && result.data && result.data.items && result.data.items.length > 0) {
+                // If server has items, we should merge or prioritize server items
+                // For simplicity in this demo, we'll map server items to our local format
+                const serverCart = result.data.items.map(item => ({
+                    id: item.ProductId,
+                    img: item.ProductImage || item.Image || '', // From joined Product data
+                    name: item.ProductName || item.Name,
+                    price: item.Price,
+                    amount: item.Quantity,
+                    totalPrice: item.Price * item.Quantity,
+                    type: item.Type || ''
+                }));
+                
+                // If local cart is empty but server has items, use server items
+                if (cart.length === 0) {
+                    cart = serverCart;
+                    localStorage.setItem("checkedProducts", JSON.stringify(cart));
+                } 
+                // If both have items, we might want to prompt user, but let's stick to local for now
+                // or just trigger an update to server to ensure sync
+            }
+            
+            renderCart();
+        } catch (err) {
+            console.log('Not logged in or offline, using local cart');
+            renderCart();
+        }
+    });
+
     function renderCart() {
         // Clear current items (except empty msg)
         Array.from(cartContainer.children).forEach(child => {
@@ -79,9 +115,9 @@
 
         if (cart.length === 0) {
             emptyMsg.style.display = 'block';
-            document.getElementById('summary-subtotal').textContent = '$0.00';
-            document.getElementById('summary-tax').textContent = '$0.00';
-            document.getElementById('summary-total').textContent = '$0.00';
+            document.getElementById('summary-subtotal').textContent = '₱0.00';
+            document.getElementById('summary-tax').textContent = '₱0.00';
+            document.getElementById('summary-total').textContent = '₱0.00';
             return;
         }
 
@@ -89,6 +125,10 @@
         let subtotal = 0;
 
         cart.forEach((item, index) => {
+            // Ensure numbers
+            if (!item.amount) item.amount = 1;
+            if (!item.totalPrice) item.totalPrice = item.price * item.amount;
+            
             subtotal += item.totalPrice;
             
             const row = document.createElement('div');
@@ -101,19 +141,19 @@
             
             row.innerHTML = `
                 <div style="display: flex; gap: 1rem; align-items: center;">
-                    <img src="${item.img}" style="width: 60px; height: 60px; object-fit: contain; background: #f9fafb; border-radius: var(--radius-sm); padding: 5px;">
+                    <img src="${item.img}" style="width: 60px; height: 60px; object-fit: contain; background: #f9fafb; border-radius: var(--radius-sm); padding: 5px;" onerror="this.src='/Content/images/placeholder.jpg'">
                     <div>
                         <h4 style="font-size: 1rem; margin-bottom: 0.25rem;">${item.name}</h4>
                         <span style="font-size: 0.85rem; color: var(--text-muted);">${item.type}</span>
                     </div>
                 </div>
-                <div style="font-weight: 600;">$${item.price}</div>
+                <div style="font-weight: 600;">₱${item.price.toFixed(2)}</div>
                 <div style="display: flex; align-items: center; border: 1px solid var(--border); border-radius: var(--radius-sm); width: fit-content;">
                     <button class="icon-btn" onclick="updateQty(${index}, -1)" style="width: 30px; height: 30px; font-size: 0.8rem;">-</button>
                     <span style="width: 30px; text-align: center; font-size: 0.9rem;">${item.amount}</span>
                     <button class="icon-btn" onclick="updateQty(${index}, 1)" style="width: 30px; height: 30px; font-size: 0.8rem;">+</button>
                 </div>
-                <div style="font-weight: 700; color: var(--primary);">$${item.totalPrice}</div>
+                <div style="font-weight: 700; color: var(--primary);">₱${item.totalPrice.toFixed(2)}</div>
                 <button class="icon-btn vue-btn" onclick="removeItem(${index})" style="color: #ef4444;" data-vue-btn="cart-remove-${index}">
                     <i class="ph-bold ph-trash"></i>
                 </button>
@@ -122,13 +162,12 @@
             cartContainer.appendChild(row);
         });
 
-        // Update Summary
-        const tax = subtotal * 0.05;
+        const tax = subtotal * 0.12;
         const total = subtotal + tax;
 
-        document.getElementById('summary-subtotal').textContent = `$${subtotal.toFixed(2)}`;
-        document.getElementById('summary-tax').textContent = `$${tax.toFixed(2)}`;
-        document.getElementById('summary-total').textContent = `$${total.toFixed(2)}`;
+        document.getElementById('summary-subtotal').textContent = `₱${subtotal.toFixed(2)}`;
+        document.getElementById('summary-tax').textContent = `₱${tax.toFixed(2)}`;
+        document.getElementById('summary-total').textContent = `₱${total.toFixed(2)}`;
     }
 
     window.updateQty = function(index, change) {
@@ -136,18 +175,38 @@
             cart[index].amount += change;
             cart[index].totalPrice = cart[index].amount * cart[index].price;
             saveAndRender();
+            
+            // Sync with backend if logged in
+            if (cart[index].id) {
+                fetch('/api/cart/update', {
+                    method: 'POST',
+                    // Using URLSearchParams ensures standard MVC binding works for simple parameters
+                    body: new URLSearchParams({
+                        productId: cart[index].id,
+                        quantity: cart[index].amount
+                    })
+                }).catch(e => console.log('Sync error:', e));
+            }
         }
     };
 
     window.removeItem = function(index) {
+        const itemToRemove = cart[index];
         cart.splice(index, 1);
         saveAndRender();
+        
+        // Sync with backend if logged in
+        if (itemToRemove.id) {
+            fetch('/api/cart/remove', {
+                method: 'POST',
+                body: new URLSearchParams({ productId: itemToRemove.id })
+            }).catch(e => console.log('Sync error:', e));
+        }
     };
 
     function saveAndRender() {
         localStorage.setItem("checkedProducts", JSON.stringify(cart));
+        window.dispatchEvent(new Event('cartUpdated')); // Update badge
         renderCart();
     }
-
-    renderCart();
 </script>

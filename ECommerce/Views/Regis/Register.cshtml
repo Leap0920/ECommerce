@@ -13,22 +13,25 @@
             <p>Join us to get fresh produce delivered daily</p>
         </div>
 
-        <form>
+        <!-- Error/Success Messages -->
+        <div id="message-container" style="display: none; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;"></div>
+
+        <form id="register-form">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                 <div class="form-group">
                     <label class="form-label">First Name</label>
-                    <input type="text" class="form-control" placeholder="John">
+                    <input type="text" id="firstName" class="form-control" placeholder="John" required>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Last Name</label>
-                    <input type="text" class="form-control" placeholder="Doe">
+                    <input type="text" id="lastName" class="form-control" placeholder="Doe" required>
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Email Address</label>
                 <div style="position: relative;">
-                    <input type="email" class="form-control" placeholder="name@example.com" style="padding-left: 2.5rem;">
+                    <input type="email" id="email" class="form-control" placeholder="name@example.com" style="padding-left: 2.5rem;" required>
                     <i class="ph ph-envelope" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
                 </div>
             </div>
@@ -36,7 +39,7 @@
             <div class="form-group">
                 <label class="form-label">Password</label>
                 <div style="position: relative;">
-                    <input type="password" class="form-control" placeholder="Create a password" style="padding-left: 2.5rem;">
+                    <input type="password" id="password" class="form-control" placeholder="Create a password (min 6 characters)" style="padding-left: 2.5rem;" minlength="6" required>
                     <i class="ph ph-lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
                 </div>
             </div>
@@ -44,12 +47,17 @@
             <div class="form-group">
                 <label class="form-label">Confirm Password</label>
                 <div style="position: relative;">
-                    <input type="password" class="form-control" placeholder="Confirm your password" style="padding-left: 2.5rem;">
+                    <input type="password" id="confirmPassword" class="form-control" placeholder="Confirm your password" style="padding-left: 2.5rem;" required>
                     <i class="ph ph-lock" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary vue-btn" style="width: 100%; margin-top: 1rem;" data-vue-btn="register-submit">Create Account</button>
+            <button type="submit" id="register-btn" class="btn btn-primary vue-btn" style="width: 100%; margin-top: 1rem;" data-vue-btn="register-submit">
+                <span id="btn-text">Create Account</span>
+                <span id="btn-loading" style="display: none;">
+                    <i class="ph ph-spinner" style="animation: spin 1s linear infinite;"></i> Creating account...
+                </span>
+            </button>
         </form>
 
         <div style="margin-top: 2rem; text-align: center; font-size: 0.9rem; color: var(--text-muted);">
@@ -58,3 +66,112 @@
     </div>
 </div>
 
+<style>
+    @@keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>
+
+<script>
+    document.getElementById('register-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const firstName = document.getElementById('firstName').value;
+        const lastName = document.getElementById('lastName').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const messageContainer = document.getElementById('message-container');
+        const btnText = document.getElementById('btn-text');
+        const btnLoading = document.getElementById('btn-loading');
+        const btn = document.getElementById('register-btn');
+        
+        // Validate passwords match
+        if (password !== confirmPassword) {
+            messageContainer.style.display = 'block';
+            messageContainer.style.background = '#f8d7da';
+            messageContainer.style.color = '#721c24';
+            messageContainer.style.border = '1px solid #dc3545';
+            messageContainer.innerHTML = '<i class="ph-fill ph-warning-circle"></i> Passwords do not match!';
+            return;
+        }
+        
+        // Validate password length
+        if (password.length < 6) {
+            messageContainer.style.display = 'block';
+            messageContainer.style.background = '#f8d7da';
+            messageContainer.style.color = '#721c24';
+            messageContainer.style.border = '1px solid #dc3545';
+            messageContainer.innerHTML = '<i class="ph-fill ph-warning-circle"></i> Password must be at least 6 characters!';
+            return;
+        }
+        
+        // Show loading
+        btnText.style.display = 'none';
+        btnLoading.style.display = 'inline';
+        btn.disabled = true;
+        messageContainer.style.display = 'none';
+        
+        try {
+            const response = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    FirstName: firstName,
+                    LastName: lastName,
+                    Email: email,
+                    Password: password,
+                    ConfirmPassword: confirmPassword
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // Show success message
+                messageContainer.style.display = 'block';
+                messageContainer.style.background = '#d4edda';
+                messageContainer.style.color = '#155724';
+                messageContainer.style.border = '1px solid #28a745';
+                messageContainer.innerHTML = '<i class="ph-fill ph-check-circle"></i> ' + result.message + ' Redirecting...';
+                
+                // Store user info in localStorage
+                localStorage.setItem('user', JSON.stringify(result.data));
+                
+                // Redirect to customer dashboard
+                setTimeout(() => {
+                    window.location.href = '@Url.Action("Index", "Customer")';
+                }, 1500);
+            } else {
+                // Show error message
+                messageContainer.style.display = 'block';
+                messageContainer.style.background = '#f8d7da';
+                messageContainer.style.color = '#721c24';
+                messageContainer.style.border = '1px solid #dc3545';
+                messageContainer.innerHTML = '<i class="ph-fill ph-warning-circle"></i> ' + result.message;
+                
+                // Reset button
+                btnText.style.display = 'inline';
+                btnLoading.style.display = 'none';
+                btn.disabled = false;
+            }
+        } catch (error) {
+            // Show error message
+            messageContainer.style.display = 'block';
+            messageContainer.style.background = '#f8d7da';
+            messageContainer.style.color = '#721c24';
+            messageContainer.style.border = '1px solid #dc3545';
+            messageContainer.innerHTML = '<i class="ph-fill ph-warning-circle"></i> Connection error. Please try again.';
+            
+            // Reset button
+            btnText.style.display = 'inline';
+            btnLoading.style.display = 'none';
+            btn.disabled = false;
+            
+            console.error('Registration error:', error);
+        }
+    });
+</script>

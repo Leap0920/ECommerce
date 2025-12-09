@@ -39,16 +39,56 @@
 
             <!-- Actions -->
             <div class="nav-actions">
-                <a href="@Url.Action("Index", "Cart")" class="icon-btn vue-icon-btn" style="position: relative;" data-vue-btn="nav-cart">
-                    <i class="ph ph-shopping-cart" style="font-size: 1.25rem;"></i>
-                    <span id="cart-badge" class="badge" style="display: none;">0</span>
-                </a>
+                <!-- Cart Icon (hidden for admin) -->
+                <div id="cart-container">
+                    <a href="@Url.Action("Index", "Cart")" class="icon-btn vue-icon-btn" style="position: relative;" data-vue-btn="nav-cart">
+                        <i class="ph ph-shopping-cart" style="font-size: 1.25rem;"></i>
+                        <span id="cart-badge" class="badge" style="display: none;">0</span>
+                    </a>
+                </div>
 
-                <a href="@Url.Action("SignIn", "Regis")" class="btn btn-outline vue-btn vue-nav-btn" style="font-size: 0.875rem;" data-vue-btn="nav-signin">Sign In</a>
-                <a href="@Url.Action("Register", "Regis")" class="btn btn-primary vue-btn vue-nav-btn" style="font-size: 0.875rem;" data-vue-btn="nav-register">Register</a>
+                <!-- Guest Actions (Sign In / Register) -->
+                <div id="guest-actions" style="display: flex; gap: 0.5rem;">
+                    <a href="@Url.Action("SignIn", "Regis")" class="btn btn-outline vue-btn vue-nav-btn" style="font-size: 0.875rem;" data-vue-btn="nav-signin">Sign In</a>
+                    <a href="@Url.Action("Register", "Regis")" class="btn btn-primary vue-btn vue-nav-btn" style="font-size: 0.875rem;" data-vue-btn="nav-register">Register</a>
+                </div>
+
+                <!-- User Actions (when logged in) -->
+                <div id="user-actions" style="display: none; align-items: center; gap: 0.75rem;">
+                    <a href="@Url.Action("Dashboard", "Customer")" class="btn btn-outline vue-btn" style="font-size: 0.875rem;" data-vue-btn="nav-account">
+                        <i class="ph ph-user" style="margin-right: 0.25rem;"></i>
+                        <span id="nav-user-name">My Account</span>
+                    </a>
+                    <button onclick="showLogoutModal()" class="btn btn-primary vue-btn vue-nav-btn" style="font-size: 0.875rem;" data-vue-btn="nav-logout">
+                        <i class="ph ph-sign-out" style="margin-right: 0.25rem;"></i>
+                        Logout
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
+
+    <!-- Logout Confirmation Modal -->
+    <div id="logout-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 2000; align-items: center; justify-content: center;">
+        <div class="card" style="width: 400px; padding: 2rem; text-align: center; animation: modalFadeIn 0.3s ease;">
+            <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem;">
+                <i class="ph-bold ph-sign-out" style="font-size: 1.5rem; color: #dc2626;"></i>
+            </div>
+            <h2 style="margin-bottom: 0.5rem; font-size: 1.5rem;">Confirm Logout</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Are you sure you want to log out of your account?</p>
+            <div style="display: flex; gap: 1rem;">
+                <button onclick="hideLogoutModal()" class="btn btn-outline" style="flex: 1;">Cancel</button>
+                <button onclick="confirmLogout()" class="btn" style="flex: 1; background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white;">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @@keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
 
     <!-- Main Content -->
     <div class="container body-content">
@@ -138,6 +178,95 @@
     </script>
     
     @RenderSection("scripts", required: false)
+    
+    <!-- Authentication & Logout Script -->
+    <script>
+        // Check authentication state and update navbar
+        async function checkAuthState() {
+            try {
+                const response = await fetch('/api/auth/current');
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    // User is logged in
+                    document.getElementById('guest-actions').style.display = 'none';
+                    document.getElementById('user-actions').style.display = 'flex';
+                    
+                    // Update user name display
+                    const userName = result.data.name || 'My Account';
+                    const navUserName = document.getElementById('nav-user-name');
+                    if (navUserName) {
+                        navUserName.textContent = userName.split(' ')[0]; // First name only
+                    }
+                    
+                    // If user is Admin, redirect the account link to admin dashboard and hide cart
+                    if (result.data.role === 'Admin') {
+                        const accountLink = document.querySelector('[data-vue-btn="nav-account"]');
+                        if (accountLink) {
+                            accountLink.href = '@Url.Action("Index", "Admin")';
+                        }
+                        // Hide cart for admin users
+                        const cartContainer = document.getElementById('cart-container');
+                        if (cartContainer) {
+                            cartContainer.style.display = 'none';
+                        }
+                    }
+                } else {
+                    // User is not logged in
+                    document.getElementById('guest-actions').style.display = 'flex';
+                    document.getElementById('user-actions').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Auth check error:', error);
+                // Default to guest state
+                document.getElementById('guest-actions').style.display = 'flex';
+                document.getElementById('user-actions').style.display = 'none';
+            }
+        }
+        
+        // Show logout confirmation modal
+        function showLogoutModal() {
+            const modal = document.getElementById('logout-modal');
+            modal.style.display = 'flex';
+        }
+        
+        // Hide logout confirmation modal
+        function hideLogoutModal() {
+            const modal = document.getElementById('logout-modal');
+            modal.style.display = 'none';
+        }
+        
+        // Confirm logout and perform logout action
+        async function confirmLogout() {
+            try {
+                await fetch('/api/auth/logout', { method: 'POST' });
+                localStorage.removeItem('user');
+                hideLogoutModal();
+                // Redirect to home page
+                window.location.href = '@Url.Action("Index", "Home")';
+            } catch (error) {
+                console.error('Logout error:', error);
+                localStorage.removeItem('user');
+                hideLogoutModal();
+                window.location.href = '@Url.Action("Index", "Home")';
+            }
+        }
+        
+        // Close modal when clicking outside
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutModal = document.getElementById('logout-modal');
+            if (logoutModal) {
+                logoutModal.addEventListener('click', function(e) {
+                    if (e.target === logoutModal) {
+                        hideLogoutModal();
+                    }
+                });
+            }
+            
+            // Check auth state on page load
+            checkAuthState();
+        });
+    </script>
     
     <!-- Cart Badge Update Script -->
     <script>

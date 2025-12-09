@@ -13,15 +13,32 @@
                 <h1 style="font-size: 2rem; margin-bottom: 0.5rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">Customers</h1>
                 <p style="color: var(--text-muted);">Manage customer accounts</p>
             </div>
+            <div id="customer-stats" style="display: flex; gap: 1.5rem;">
+                <div style="text-align: center;">
+                    <p style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Total</p>
+                    <p id="stat-total" style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">0</p>
+                </div>
+                <div style="text-align: center;">
+                    <p style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Active</p>
+                    <p id="stat-active" style="font-size: 1.5rem; font-weight: 700; color: #16a34a;">0</p>
+                </div>
+            </div>
         </div>
 
         <div class="card" style="padding: 1.5rem;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem;">
                 <div class="form-group" style="margin: 0; width: 300px;">
                     <div style="position: relative;">
-                        <input type="text" class="form-control" placeholder="Search customers..." style="padding-left: 2.5rem;" id="customer-search">
+                        <input type="text" class="form-control" placeholder="Search customers..." style="padding-left: 2.5rem;" id="customer-search" oninput="filterCustomers()">
                         <i class="ph ph-magnifying-glass" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
                     </div>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <select id="status-filter" class="form-control" style="width: 120px;" onchange="filterCustomers()">
+                        <option value="all">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
                 </div>
             </div>
 
@@ -32,12 +49,16 @@
                         <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Email</th>
                         <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Orders</th>
                         <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Total Spent</th>
+                        <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Status</th>
                         <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500; text-align: right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody id="customers-body">
                     <tr>
-                        <td colspan="5" style="padding: 3rem; text-align: center; color: var(--text-muted);">No customers found.</td>
+                        <td colspan="6" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                            <i class="ph ph-spinner" style="font-size: 2rem; animation: spin 1s linear infinite;"></i>
+                            <p style="margin-top: 0.5rem;">Loading customers...</p>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -45,46 +66,236 @@
     </div>
 </div>
 
+<!-- Customer Details Modal -->
+<div id="customer-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(5px); z-index: 1000; align-items: center; justify-content: center;">
+    <div class="card" style="width: 500px; padding: 2rem; max-height: 80vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h2>Customer Details</h2>
+            <button onclick="closeCustomerModal()" class="icon-btn"><i class="ph ph-x"></i></button>
+        </div>
+        <div id="customer-details">
+            <!-- Customer details will be loaded here -->
+        </div>
+    </div>
+</div>
+
+<style>
+    @@keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+</style>
+
 <script>
-    // This would typically fetch from server, but for now showing placeholder
+    let customers = [];
+    let customerOrders = {};
     const tbody = document.getElementById("customers-body");
     
-    // Placeholder - in real app, this would come from server
-    const customers = [];
+    document.addEventListener('DOMContentLoaded', function() {
+        loadCustomers();
+    });
     
-    function renderCustomers() {
-        if (customers.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" style="padding: 3rem; text-align: center; color: var(--text-muted);">No customers found.</td></tr>`;
+    async function loadCustomers() {
+        try {
+            // Fetch customers (users with role Customer)
+            const usersResponse = await fetch('/api/users/customers');
+            const usersResult = await usersResponse.json();
+            
+            // Fetch all orders to calculate customer stats
+            const ordersResponse = await fetch('/api/orders');
+            const ordersResult = await ordersResponse.json();
+            
+            if (usersResult.success) {
+                customers = usersResult.data;
+                
+                // Build orders map per customer
+                if (ordersResult.success && ordersResult.data) {
+                    ordersResult.data.forEach(order => {
+                        if (order.UserId) {
+                            if (!customerOrders[order.UserId]) {
+                                customerOrders[order.UserId] = {
+                                    count: 0,
+                                    total: 0
+                                };
+                            }
+                            customerOrders[order.UserId].count++;
+                            customerOrders[order.UserId].total += order.Total;
+                        }
+                    });
+                }
+                
+                // Update stats
+                const totalCustomers = customers.length;
+                const activeCustomers = customers.filter(c => c.IsActive).length;
+                document.getElementById('stat-total').textContent = totalCustomers;
+                document.getElementById('stat-active').textContent = activeCustomers;
+                
+                renderCustomers(customers);
+            } else {
+                tbody.innerHTML = `<tr><td colspan="6" style="padding: 3rem; text-align: center; color: red;">${usersResult.message}</td></tr>`;
+            }
+        } catch (error) {
+            console.error('Error loading customers:', error);
+            tbody.innerHTML = `<tr><td colspan="6" style="padding: 3rem; text-align: center; color: red;">Error loading customers.</td></tr>`;
+        }
+    }
+    
+    function renderCustomers(data) {
+        tbody.innerHTML = '';
+        
+        if (data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+                <i class="ph ph-users" style="font-size: 3rem; opacity: 0.5;"></i>
+                <p style="margin-top: 1rem;">No customers found.</p>
+            </td></tr>`;
             return;
         }
         
-        tbody.innerHTML = "";
-        customers.forEach(customer => {
+        data.forEach(customer => {
+            const fullName = `${customer.FirstName} ${customer.LastName}`;
+            const initials = `${customer.FirstName.charAt(0)}${customer.LastName.charAt(0)}`.toUpperCase();
+            const orderStats = customerOrders[customer.Id] || { count: 0, total: 0 };
+            const joinDate = new Date(customer.CreatedDate).toLocaleDateString();
+            
             const tr = document.createElement("tr");
             tr.style.borderBottom = "1px solid var(--border)";
             tr.innerHTML = `
                 <td style="padding: 1rem 0;">
                     <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <div style="width: 40px; height: 40px; background: #e5e7eb; border-radius: 50%;"></div>
-                        <span style="font-weight: 600;">${customer.name}</span>
+                        <div style="width: 40px; height: 40px; background: var(--gradient-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.875rem;">
+                            ${initials}
+                        </div>
+                        <div>
+                            <span style="font-weight: 600;">${fullName}</span>
+                            <p style="font-size: 0.75rem; color: var(--text-muted);">Joined ${joinDate}</p>
+                        </div>
                     </div>
                 </td>
-                <td style="padding: 1rem 0;">${customer.email}</td>
-                <td style="padding: 1rem 0;">${customer.orderCount || 0}</td>
-                <td style="padding: 1rem 0; font-weight: 600;">$${customer.totalSpent || 0}.00</td>
+                <td style="padding: 1rem 0;">${customer.Email}</td>
+                <td style="padding: 1rem 0;">
+                    <span style="font-weight: 600;">${orderStats.count}</span> orders
+                </td>
+                <td style="padding: 1rem 0; font-weight: 600; color: var(--primary);">₱${orderStats.total.toFixed(2)}</td>
+                <td style="padding: 1rem 0;">
+                    <span style="${customer.IsActive ? 'background: #dcfce7; color: #166534;' : 'background: #fee2e2; color: #991b1b;'} padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.85rem; font-weight: 500;">
+                        ${customer.IsActive ? 'Active' : 'Inactive'}
+                    </span>
+                </td>
                 <td style="padding: 1rem 0; text-align: right;">
-                    <button class="icon-btn"><i class="ph-bold ph-eye"></i></button>
+                    <button class="icon-btn" onclick="viewCustomer(${customer.Id})" title="View Details"><i class="ph-bold ph-eye"></i></button>
+                    <button class="icon-btn" onclick="toggleStatus(${customer.Id})" title="${customer.IsActive ? 'Deactivate' : 'Activate'}">
+                        <i class="ph-bold ph-${customer.IsActive ? 'prohibit' : 'check-circle'}" style="color: ${customer.IsActive ? '#ef4444' : '#16a34a'};"></i>
+                    </button>
                 </td>
             `;
             tbody.appendChild(tr);
         });
     }
     
-    renderCustomers();
+    function filterCustomers() {
+        const query = document.getElementById('customer-search').value.toLowerCase();
+        const statusFilter = document.getElementById('status-filter').value;
+        
+        let filtered = customers.filter(c => {
+            const fullName = `${c.FirstName} ${c.LastName}`.toLowerCase();
+            const matchesSearch = fullName.includes(query) || c.Email.toLowerCase().includes(query);
+            
+            let matchesStatus = true;
+            if (statusFilter === 'active') {
+                matchesStatus = c.IsActive === true;
+            } else if (statusFilter === 'inactive') {
+                matchesStatus = c.IsActive === false;
+            }
+            
+            return matchesSearch && matchesStatus;
+        });
+        
+        renderCustomers(filtered);
+    }
     
-    // Search functionality
-    document.getElementById("customer-search").addEventListener("input", function(e) {
-        // Search logic would go here
+    function viewCustomer(id) {
+        const customer = customers.find(c => c.Id === id);
+        if (!customer) return;
+        
+        const orderStats = customerOrders[id] || { count: 0, total: 0 };
+        const fullName = `${customer.FirstName} ${customer.LastName}`;
+        const initials = `${customer.FirstName.charAt(0)}${customer.LastName.charAt(0)}`.toUpperCase();
+        const joinDate = new Date(customer.CreatedDate).toLocaleDateString();
+        
+        const detailsHtml = `
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <div style="width: 80px; height: 80px; background: var(--gradient-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.5rem; margin: 0 auto 1rem;">
+                    ${initials}
+                </div>
+                <h3 style="margin-bottom: 0.25rem;">${fullName}</h3>
+                <p style="color: var(--text-muted);">${customer.Email}</p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                <div class="card" style="padding: 1rem; text-align: center;">
+                    <p style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Total Orders</p>
+                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">${orderStats.count}</p>
+                </div>
+                <div class="card" style="padding: 1rem; text-align: center;">
+                    <p style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Total Spent</p>
+                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--primary);">₱${orderStats.total.toFixed(2)}</p>
+                </div>
+            </div>
+            
+            <div style="border-top: 1px solid var(--border); padding-top: 1rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="color: var(--text-muted);">Status</span>
+                    <span style="${customer.IsActive ? 'color: #16a34a;' : 'color: #dc2626;'} font-weight: 600;">${customer.IsActive ? 'Active' : 'Inactive'}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="color: var(--text-muted);">Member Since</span>
+                    <span style="font-weight: 500;">${joinDate}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: var(--text-muted);">Customer ID</span>
+                    <span style="font-family: monospace;">#${customer.Id}</span>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('customer-details').innerHTML = detailsHtml;
+        document.getElementById('customer-modal').style.display = 'flex';
+    }
+    
+    function closeCustomerModal() {
+        document.getElementById('customer-modal').style.display = 'none';
+    }
+    
+    async function toggleStatus(id) {
+        const customer = customers.find(c => c.Id === id);
+        if (!customer) return;
+        
+        const action = customer.IsActive ? 'deactivate' : 'activate';
+        if (!confirm(`Are you sure you want to ${action} this customer?`)) return;
+        
+        try {
+            const response = await fetch('/api/users/toggle-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `id=${id}`
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                loadCustomers(); // Reload
+            } else {
+                alert('Failed: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Error toggling status:', error);
+            alert('Error updating customer status');
+        }
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('customer-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeCustomerModal();
+        }
     });
 </script>
-

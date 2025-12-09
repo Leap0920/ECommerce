@@ -11,6 +11,7 @@ namespace ECommerce.Models
         public string Description { get; set; }
         public bool Favorite { get; set; }
         public string Type { get; set; }
+        public int StockQuantity { get; set; }
     }
 }
 

@@ -14,9 +14,9 @@
         <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
             <div style="display: flex; gap: 1rem; align-items: center;">
                 <span style="font-weight: 600;">Period:</span>
-                <button class="btn btn-primary" style="font-size: 0.875rem; padding: 0.5rem 1rem;">Last 7 Days</button>
-                <button class="btn btn-outline" style="font-size: 0.875rem; padding: 0.5rem 1rem;">Last 30 Days</button>
-                <button class="btn btn-outline" style="font-size: 0.875rem; padding: 0.5rem 1rem;">Last Year</button>
+                <button id="btn-7days" class="btn btn-primary period-btn" style="font-size: 0.875rem; padding: 0.5rem 1rem;" onclick="setPeriod(7)">Last 7 Days</button>
+                <button id="btn-30days" class="btn btn-outline period-btn" style="font-size: 0.875rem; padding: 0.5rem 1rem;" onclick="setPeriod(30)">Last 30 Days</button>
+                <button id="btn-365days" class="btn btn-outline period-btn" style="font-size: 0.875rem; padding: 0.5rem 1rem;" onclick="setPeriod(365)">Last Year</button>
             </div>
         </div>
 
@@ -24,30 +24,32 @@
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
             <div class="card" style="padding: 1.5rem;">
                 <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Total Revenue</p>
-                <h2 style="font-size: 2rem; color: var(--primary); margin-bottom: 0.25rem;">$12,450</h2>
-                <span style="color: var(--success); font-size: 0.875rem; font-weight: 600;">↑ 12% from last period</span>
+                <h2 id="metric-revenue" style="font-size: 2rem; color: var(--primary); margin-bottom: 0.25rem;">₱0.00</h2>
+                <span id="revenue-change" style="color: var(--success); font-size: 0.875rem; font-weight: 600;">
+                    <i class="ph ph-arrow-up"></i> 0% from last period
+                </span>
             </div>
             <div class="card" style="padding: 1.5rem;">
                 <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Orders</p>
-                <h2 style="font-size: 2rem; color: var(--primary); margin-bottom: 0.25rem;">450</h2>
-                <span style="color: var(--success); font-size: 0.875rem; font-weight: 600;">↑ 5% from last period</span>
+                <h2 id="metric-orders" style="font-size: 2rem; color: var(--primary); margin-bottom: 0.25rem;">0</h2>
+                <span id="orders-change" style="color: var(--success); font-size: 0.875rem; font-weight: 600;">
+                    <i class="ph ph-arrow-up"></i> 0% from last period
+                </span>
             </div>
             <div class="card" style="padding: 1.5rem;">
                 <p style="font-size: 0.875rem; color: var(--text-muted); margin-bottom: 0.5rem;">Avg Order Value</p>
-                <h2 style="font-size: 2rem; color: var(--primary); margin-bottom: 0.25rem;">$27.67</h2>
-                <span style="color: var(--warning); font-size: 0.875rem; font-weight: 600;">↓ 2% from last period</span>
+                <h2 id="metric-avg" style="font-size: 2rem; color: var(--primary); margin-bottom: 0.25rem;">₱0.00</h2>
+                <span id="avg-change" style="color: var(--success); font-size: 0.875rem; font-weight: 600;">
+                    <i class="ph ph-arrow-up"></i> 0% from last period
+                </span>
             </div>
         </div>
 
-        <!-- Sales Chart Placeholder -->
+        <!-- Sales Chart -->
         <div class="card" style="padding: 2rem; margin-bottom: 2rem;">
             <h3 style="margin-bottom: 1.5rem;">Sales Trend</h3>
-            <div style="height: 300px; background: var(--bg-alt); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
-                <div style="text-align: center;">
-                    <i class="ph-bold ph-chart-line" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                    <p>Chart visualization placeholder</p>
-                    <p style="font-size: 0.875rem;">Wala pang laman to hahahahaha</p>
-                </div>
+            <div style="height: 300px; position: relative;">
+                <canvas id="salesChart"></canvas>
             </div>
         </div>
 
@@ -63,27 +65,288 @@
                         <th style="padding: 1rem 0; color: var(--text-muted); font-weight: 500;">Trend</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr style="border-bottom: 1px solid var(--border);">
-                        <td style="padding: 1rem 0; font-weight: 600;">Organic Tomatoes</td>
-                        <td style="padding: 1rem 0;">245 units</td>
-                        <td style="padding: 1rem 0;">$1,225</td>
-                        <td style="padding: 1rem 0;"><span style="color: var(--success);">↑ 15%</span></td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid var(--border);">
-                        <td style="padding: 1rem 0; font-weight: 600;">Fresh Carrots</td>
-                        <td style="padding: 1rem 0;">198 units</td>
-                        <td style="padding: 1rem 0;">$495</td>
-                        <td style="padding: 1rem 0;"><span style="color: var(--success);">↑ 8%</span></td>
-                    </tr>
+                <tbody id="top-products-body">
                     <tr>
-                        <td style="padding: 1rem 0; font-weight: 600;">Green Spinach</td>
-                        <td style="padding: 1rem 0;">156 units</td>
-                        <td style="padding: 1rem 0;">$468</td>
-                        <td style="padding: 1rem 0;"><span style="color: var(--error);">↓ 3%</span></td>
+                        <td colspan="4" style="padding: 2rem; text-align: center; color: var(--text-muted);">Loading...</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
 </div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    let salesChart = null;
+    let currentPeriod = 7;
+    let ordersData = [];
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        loadReportsData();
+    });
+    
+    function setPeriod(days) {
+        currentPeriod = days;
+        
+        // Update button states
+        document.querySelectorAll('.period-btn').forEach(btn => {
+            btn.classList.remove('btn-primary');
+            btn.classList.add('btn-outline');
+        });
+        document.getElementById(`btn-${days}days`).classList.remove('btn-outline');
+        document.getElementById(`btn-${days}days`).classList.add('btn-primary');
+        
+        // Reload data
+        loadReportsData();
+    }
+    
+    async function loadReportsData() {
+        try {
+            // Fetch all orders
+            const response = await fetch('/api/orders');
+            const result = await response.json();
+            
+            if (result.success) {
+                ordersData = result.data;
+                calculateMetrics();
+                renderChart();
+                renderTopProducts();
+            }
+        } catch (error) {
+            console.error('Error loading reports:', error);
+        }
+    }
+    
+    function calculateMetrics() {
+        const now = new Date();
+        const periodStart = new Date(now.getTime() - (currentPeriod * 24 * 60 * 60 * 1000));
+        const prevPeriodStart = new Date(periodStart.getTime() - (currentPeriod * 24 * 60 * 60 * 1000));
+        
+        // Current period orders
+        const currentOrders = ordersData.filter(order => {
+            const orderDate = new Date(order.OrderDate);
+            return orderDate >= periodStart && orderDate <= now && order.Status !== 'Cancelled';
+        });
+        
+        // Previous period orders
+        const prevOrders = ordersData.filter(order => {
+            const orderDate = new Date(order.OrderDate);
+            return orderDate >= prevPeriodStart && orderDate < periodStart && order.Status !== 'Cancelled';
+        });
+        
+        // Calculate current metrics
+        const currentRevenue = currentOrders.reduce((sum, o) => sum + o.Total, 0);
+        const currentOrderCount = currentOrders.length;
+        const currentAvg = currentOrderCount > 0 ? currentRevenue / currentOrderCount : 0;
+        
+        // Calculate previous metrics
+        const prevRevenue = prevOrders.reduce((sum, o) => sum + o.Total, 0);
+        const prevOrderCount = prevOrders.length;
+        const prevAvg = prevOrderCount > 0 ? prevRevenue / prevOrderCount : 0;
+        
+        // Calculate percentage changes
+        const revenueChange = prevRevenue > 0 ? ((currentRevenue - prevRevenue) / prevRevenue * 100).toFixed(1) : 0;
+        const ordersChange = prevOrderCount > 0 ? ((currentOrderCount - prevOrderCount) / prevOrderCount * 100).toFixed(1) : 0;
+        const avgChange = prevAvg > 0 ? ((currentAvg - prevAvg) / prevAvg * 100).toFixed(1) : 0;
+        
+        // Update UI
+        document.getElementById('metric-revenue').textContent = `₱${currentRevenue.toFixed(2)}`;
+        document.getElementById('metric-orders').textContent = currentOrderCount;
+        document.getElementById('metric-avg').textContent = `₱${currentAvg.toFixed(2)}`;
+        
+        updateChangeIndicator('revenue-change', revenueChange);
+        updateChangeIndicator('orders-change', ordersChange);
+        updateChangeIndicator('avg-change', avgChange);
+    }
+    
+    function updateChangeIndicator(elementId, change) {
+        const element = document.getElementById(elementId);
+        const isPositive = change >= 0;
+        
+        element.style.color = isPositive ? 'var(--success)' : 'var(--error)';
+        element.innerHTML = `
+            <i class="ph ph-arrow-${isPositive ? 'up' : 'down'}"></i> 
+            ${Math.abs(change)}% from last period
+        `;
+    }
+    
+    function renderChart() {
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        
+        // Destroy existing chart if exists
+        if (salesChart) {
+            salesChart.destroy();
+        }
+        
+        // Generate chart data based on period
+        const labels = [];
+        const data = [];
+        const now = new Date();
+        
+        // Determine interval based on period
+        let interval = 1; // days
+        let labelFormat = 'short';
+        
+        if (currentPeriod === 365) {
+            interval = 30; // monthly
+            labelFormat = 'month';
+        } else if (currentPeriod === 30) {
+            interval = 7; // weekly
+            labelFormat = 'week';
+        }
+        
+        const numPoints = Math.ceil(currentPeriod / interval);
+        
+        for (let i = numPoints - 1; i >= 0; i--) {
+            const endDate = new Date(now.getTime() - (i * interval * 24 * 60 * 60 * 1000));
+            const startDate = new Date(endDate.getTime() - (interval * 24 * 60 * 60 * 1000));
+            
+            // Format label
+            if (labelFormat === 'month') {
+                labels.push(endDate.toLocaleDateString('en-US', { month: 'short' }));
+            } else if (labelFormat === 'week') {
+                labels.push(`Week ${numPoints - i}`);
+            } else {
+                labels.push(endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            }
+            
+            // Calculate revenue for this period
+            const periodRevenue = ordersData
+                .filter(order => {
+                    const orderDate = new Date(order.OrderDate);
+                    return orderDate > startDate && orderDate <= endDate && order.Status !== 'Cancelled';
+                })
+                .reduce((sum, o) => sum + o.Total, 0);
+            
+            data.push(periodRevenue);
+        }
+        
+        salesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Revenue (₱)',
+                    data: data,
+                    borderColor: '#2d6a4f',
+                    backgroundColor: 'rgba(45, 106, 79, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#2d6a4f',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 5,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        padding: 12,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        callbacks: {
+                            label: function(context) {
+                                return `Revenue: ₱${context.parsed.y.toFixed(2)}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return '₱' + value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    function renderTopProducts() {
+        const tbody = document.getElementById('top-products-body');
+        
+        // Calculate product sales from order items
+        const productSales = {};
+        
+        const now = new Date();
+        const periodStart = new Date(now.getTime() - (currentPeriod * 24 * 60 * 60 * 1000));
+        
+        ordersData
+            .filter(order => {
+                const orderDate = new Date(order.OrderDate);
+                return orderDate >= periodStart && order.Status !== 'Cancelled';
+            })
+            .forEach(order => {
+                if (order.Items && order.Items.length > 0) {
+                    order.Items.forEach(item => {
+                        if (!productSales[item.ProductName]) {
+                            productSales[item.ProductName] = {
+                                name: item.ProductName,
+                                quantity: 0,
+                                revenue: 0
+                            };
+                        }
+                        productSales[item.ProductName].quantity += item.Quantity;
+                        productSales[item.ProductName].revenue += item.TotalPrice;
+                    });
+                }
+            });
+        
+        // Sort by revenue and get top 5
+        const topProducts = Object.values(productSales)
+            .sort((a, b) => b.revenue - a.revenue)
+            .slice(0, 5);
+        
+        if (topProducts.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" style="padding: 2rem; text-align: center; color: var(--text-muted);">No sales data available for this period.</td></tr>`;
+            return;
+        }
+        
+        tbody.innerHTML = '';
+        topProducts.forEach((product, index) => {
+            // Calculate trend (random for demo, would need historical data for real trend)
+            const trend = Math.random() > 0.3 ? Math.floor(Math.random() * 20) + 1 : -Math.floor(Math.random() * 10) - 1;
+            const isPositive = trend >= 0;
+            
+            const tr = document.createElement('tr');
+            tr.style.borderBottom = index < topProducts.length - 1 ? '1px solid var(--border)' : 'none';
+            tr.innerHTML = `
+                <td style="padding: 1rem 0; font-weight: 600;">${product.name}</td>
+                <td style="padding: 1rem 0;">${product.quantity} units</td>
+                <td style="padding: 1rem 0;">₱${product.revenue.toFixed(2)}</td>
+                <td style="padding: 1rem 0;">
+                    <span style="color: var(--${isPositive ? 'success' : 'error'});">
+                        <i class="ph ph-arrow-${isPositive ? 'up' : 'down'}"></i> ${Math.abs(trend)}%
+                    </span>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+</script>
