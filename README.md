@@ -321,7 +321,7 @@ This project is created for educational purposes as part of IPT (Integrative Pro
 
 ## 👨‍💻 Authors
 
-- **Your Name** - *Initial work*
+- **@jayjayandcattos** 
 
 ---
 
