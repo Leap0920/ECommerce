@@ -3,34 +3,189 @@
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
 }
 
-<aside style="width: 250px; flex-shrink: 0;">
-    <div class="card" style="padding: 1.5rem; position: sticky; top: 100px; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(45, 106, 79, 0.1); position: relative; overflow: hidden;">
-        <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-primary);"></div>
-        <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Menu</h3>
-        <ul style="display: flex; flex-direction: column; gap: 0.5rem; list-style: none; padding: 0; margin: 0;">
+<style>
+    .admin-sidebar {
+        width: 260px;
+        flex-shrink: 0;
+    }
+    
+    .admin-sidebar-card {
+        padding: 1.5rem;
+        position: sticky;
+        top: 100px;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border: 1px solid var(--border);
+        box-shadow: 0 4px 20px rgba(45, 106, 79, 0.1);
+        overflow: hidden;
+        border-radius: 12px;
+    }
+    
+    .admin-sidebar-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gradient-primary);
+    }
+    
+    .admin-menu-title {
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-weight: 700;
+        text-align: center;
+    }
+    
+    .admin-menu-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .admin-menu-link {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.75rem;
+        width: 100%;
+        padding: 0.875rem 1.25rem;
+        font-size: 0.95rem;
+        font-weight: 500;
+        border-radius: 8px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+    
+    .admin-menu-link.active {
+        background: var(--gradient-primary);
+        color: white;
+        box-shadow: 0 4px 12px rgba(45, 106, 79, 0.3);
+    }
+    
+    .admin-menu-link:not(.active) {
+        background: transparent;
+        color: var(--text-main);
+        border: none;
+    }
+    
+    .admin-menu-link:not(.active):hover {
+        background: var(--bg-alt);
+        color: var(--primary);
+        transform: translateX(4px);
+    }
+    
+    .admin-menu-link i {
+        font-size: 1.1rem;
+    }
+    
+    /* Responsive Styles */
+    @@media (max-width: 1024px) {
+        .admin-sidebar {
+            width: 220px;
+        }
+        
+        .admin-sidebar-card {
+            padding: 1.25rem;
+        }
+        
+        .admin-menu-link {
+            padding: 0.75rem 0.875rem;
+            font-size: 0.9rem;
+        }
+    }
+    
+    @@media (max-width: 768px) {
+        .admin-sidebar {
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+        
+        .admin-sidebar-card {
+            position: static;
+        }
+        
+        .admin-menu-list {
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .admin-menu-list li {
+            flex: 0 1 auto;
+        }
+        
+        .admin-menu-link {
+            padding: 0.625rem 1rem;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+        
+        .admin-menu-link:not(.active):hover {
+            transform: translateY(-2px);
+        }
+    }
+    
+    @@media (max-width: 480px) {
+        .admin-menu-link {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
+            gap: 0.5rem;
+        }
+        
+        .admin-menu-link i {
+            font-size: 1rem;
+        }
+        
+        .admin-menu-title {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+    }
+</style>
+
+<aside class="admin-sidebar">
+    <div class="card admin-sidebar-card">
+        <h3 class="admin-menu-title">Menu</h3>
+        <ul class="admin-menu-list">
             <li>
-                <a href="@Url.Action("Index", "Admin")" class="btn @(currentAction == "Index" && currentController == "Admin" ? "btn-primary" : "btn-outline")" style="width: 100%; justify-content: start; gap: 0.75rem; @(currentAction == "Index" && currentController == "Admin" ? "" : "border: none;")">
-                    <i class="ph-bold ph-squares-four"></i> Dashboard
+                <a href="@Url.Action("Index", "Admin")" class="admin-menu-link @(currentAction == "Index" && currentController == "Admin" ? "active" : "")">
+                    <i class="ph-bold ph-squares-four"></i>
+                    <span>Dashboard</span>
                 </a>
             </li>
             <li>
-                <a href="@Url.Action("Products", "Admin")" class="btn @(currentAction == "Products" && currentController == "Admin" ? "btn-primary" : "btn-outline")" style="width: 100%; justify-content: start; gap: 0.75rem; @(currentAction == "Products" && currentController == "Admin" ? "" : "border: none;")">
-                    <i class="ph-bold ph-package"></i> Products
+                <a href="@Url.Action("Products", "Admin")" class="admin-menu-link @(currentAction == "Products" && currentController == "Admin" ? "active" : "")">
+                    <i class="ph-bold ph-package"></i>
+                    <span>Products</span>
                 </a>
             </li>
             <li>
-                <a href="@Url.Action("Orders", "Admin")" class="btn @(currentAction == "Orders" && currentController == "Admin" ? "btn-primary" : "btn-outline")" style="width: 100%; justify-content: start; gap: 0.75rem; @(currentAction == "Orders" && currentController == "Admin" ? "" : "border: none;")">
-                    <i class="ph-bold ph-shopping-cart"></i> Orders
+                <a href="@Url.Action("Orders", "Admin")" class="admin-menu-link @(currentAction == "Orders" && currentController == "Admin" ? "active" : "")">
+                    <i class="ph-bold ph-shopping-cart"></i>
+                    <span>Orders</span>
                 </a>
             </li>
             <li>
-                <a href="@Url.Action("Reports", "Admin")" class="btn @(currentAction == "Reports" && currentController == "Admin" ? "btn-primary" : "btn-outline")" style="width: 100%; justify-content: start; gap: 0.75rem; @(currentAction == "Reports" && currentController == "Admin" ? "" : "border: none;")">
-                    <i class="ph-bold ph-chart-line"></i> Reports
+                <a href="@Url.Action("Reports", "Admin")" class="admin-menu-link @(currentAction == "Reports" && currentController == "Admin" ? "active" : "")">
+                    <i class="ph-bold ph-chart-line"></i>
+                    <span>Reports</span>
                 </a>
             </li>
             <li>
-                <a href="@Url.Action("Customers", "Admin")" class="btn @((currentAction == "Customers" && currentController == "Admin") || (currentAction == "Index" && currentController == "Customer") ? "btn-primary" : "btn-outline")" style="width: 100%; justify-content: start; gap: 0.75rem; @((currentAction == "Customers" && currentController == "Admin") || (currentAction == "Index" && currentController == "Customer") ? "" : "border: none;")">
-                    <i class="ph-bold ph-users"></i> Customers
+                <a href="@Url.Action("Customers", "Admin")" class="admin-menu-link @((currentAction == "Customers" && currentController == "Admin") || (currentAction == "Index" && currentController == "Customer") ? "active" : "")">
+                    <i class="ph-bold ph-users"></i>
+                    <span>Customers</span>
                 </a>
             </li>
         </ul>
