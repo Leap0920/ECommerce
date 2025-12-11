@@ -247,11 +247,95 @@
     </div>
 </div>
 
+<!-- Authentication Required Modal -->
+<div id="auth-modal" class="auth-modal-backdrop" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center;">
+    <div class="card auth-modal-card" style="padding: 3rem; text-align: center; max-width: 450px; position: relative;">
+        <div class="auth-modal-icon" style="width: 80px; height: 80px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: #92400e;">
+            <i class="ph-fill ph-lock" style="font-size: 2.5rem;"></i>
+        </div>
+        <h2 style="margin-bottom: 0.5rem; color: var(--text-main);">Sign In Required</h2>
+        <p style="color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6;">
+            Please sign in or create an account to complete your purchase. Don't worry, your cart items are saved!
+        </p>
+        
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; color: #166534;">
+                <i class="ph-fill ph-shopping-cart" style="font-size: 1.25rem;"></i>
+                <span style="font-weight: 600;">Your cart (<span id="auth-cart-count">0</span> items) is safe!</span>
+            </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <a href="@Url.Action("SignIn", "Regis")?returnUrl=@Url.Action("Checkout", "Cart")" class="btn btn-primary vue-btn" style="width: 100%; padding: 1rem;">
+                <i class="ph-bold ph-sign-in" style="margin-right: 0.5rem;"></i>
+                Sign In
+            </a>
+            <a href="@Url.Action("Register", "Regis")?returnUrl=@Url.Action("Checkout", "Cart")" class="btn btn-outline" style="width: 100%; padding: 1rem;">
+                <i class="ph-bold ph-user-plus" style="margin-right: 0.5rem;"></i>
+                Create Account
+            </a>
+        </div>
+        
+        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+            <a href="@Url.Action("Index", "Cart")" style="color: var(--text-muted); font-size: 0.875rem; text-decoration: none;">
+                <i class="ph ph-arrow-left" style="margin-right: 0.25rem;"></i>
+                Back to Cart
+            </a>
+        </div>
+    </div>
+</div>
+
 <style>
     @@keyframes spin {
         from { transform: rotate(0deg); }
         to { transform: rotate(360deg); }
     }
+    
+    /* Auth Modal Animations */
+    @@keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @@keyframes slideUp {
+        from { 
+            opacity: 0;
+            transform: translateY(30px) scale(0.95);
+        }
+        to { 
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+    
+    @@keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    @@keyframes shake {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-5deg); }
+        75% { transform: rotate(5deg); }
+    }
+    
+    .auth-modal-backdrop {
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+    
+    .auth-modal-card {
+        animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    
+    .auth-modal-icon {
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .auth-modal-icon i {
+        animation: shake 0.5s ease-in-out;
+        animation-delay: 0.3s;
+    }
+    
     .payment-option:has(input:checked) {
         border-color: var(--primary) !important;
         background: rgba(45, 106, 79, 0.05);
@@ -287,16 +371,25 @@
                 document.getElementById('fname').value = nameParts[0] || '';
                 document.getElementById('lname').value = nameParts.slice(1).join(' ') || '';
                 document.getElementById('email').value = result.data.email || '';
+                
+                // Sync selected items to backend cart
+                await syncCart();
+            } else {
+                // User is not logged in - show login modal
+                showAuthModal();
             }
-            
-            // Sync selected items to backend cart
-            await syncCart();
         } catch (e) {
-            console.log("Guest checkout or sync error:", e);
+            console.log("Auth check error:", e);
+            showAuthModal();
         }
         
         renderSummary();
     });
+    
+    function showAuthModal() {
+        document.getElementById('auth-cart-count').textContent = cart.length;
+        document.getElementById('auth-modal').style.display = 'flex';
+    }
 
     async function syncCart() {
         if (cart.length === 0) return;

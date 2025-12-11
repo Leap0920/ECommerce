@@ -33,10 +33,19 @@ namespace ECommerce.Controllers.Api
                     return Json(new { success = false, message = "Invalid email or password" });
                 }
 
-                // For production, use BCrypt to verify password
-                // bool isValidPassword = BCrypt.Net.BCrypt.Verify(model.Password, user.Password);
-                // For simplicity, comparing plain text (NOT RECOMMENDED for production)
-                if (user.Password != model.Password)
+                // Verify password using BCrypt
+                bool isValidPassword = false;
+                try
+                {
+                    isValidPassword = BCrypt.Net.BCrypt.Verify(model.Password, user.Password);
+                }
+                catch
+                {
+                    // If BCrypt fails (e.g., password is not hashed), try plain text comparison as fallback
+                    isValidPassword = user.Password == model.Password;
+                }
+                
+                if (!isValidPassword)
                 {
                     return Json(new { success = false, message = "Invalid email or password" });
                 }
@@ -113,14 +122,13 @@ namespace ECommerce.Controllers.Api
                     return Json(new { success = false, message = "Email already registered" });
                 }
 
-                // Create new user
+                // Create new user with hashed password
                 var user = new User
                 {
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     Email = model.Email,
-                    // For production, hash the password: BCrypt.Net.BCrypt.HashPassword(model.Password)
-                    Password = model.Password,
+                    Password = BCrypt.Net.BCrypt.HashPassword(model.Password),
                     Role = "Customer",
                     IsActive = true,
                     CreatedDate = DateTime.Now

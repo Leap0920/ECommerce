@@ -1,39 +1,137 @@
 @{
-    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
-    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var controllerName = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var actionName = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    
+    bool IsSidebarActive(string action) {
+        return actionName.Equals(action, StringComparison.OrdinalIgnoreCase);
+    }
 }
 
-<aside style="width: 250px; flex-shrink: 0;">
-    <div class="card" style="padding: 1.5rem; position: sticky; top: 100px; background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%); border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(45, 106, 79, 0.1); position: relative; overflow: hidden;">
-        <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-primary);"></div>
-        <h3 style="font-size: 1.1rem; margin-bottom: 1.5rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">Menu</h3>
-        <ul style="display: flex; flex-direction: column; gap: 0.5rem; list-style: none; padding: 0; margin: 0;">
+<style>
+    .admin-sidebar {
+        width: 260px;
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border: 1px solid var(--border);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        height: fit-content;
+        position: sticky;
+        top: 100px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+    
+    .admin-sidebar-header {
+        padding-bottom: 1.5rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid var(--border);
+    }
+    
+    .admin-sidebar-header h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        background: var(--gradient-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .admin-nav-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .admin-nav-link {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    
+    .admin-nav-link:hover {
+        background: var(--gradient-light);
+        color: var(--primary);
+    }
+    
+    .admin-nav-link.active {
+        background: var(--gradient-primary);
+        color: white;
+    }
+    
+    .admin-nav-link i {
+        font-size: 1.25rem;
+    }
+
+    @@media (max-width: 768px) {
+        .admin-sidebar {
+            width: 100%;
+            position: relative;
+            top: 0;
+        }
+        
+        .admin-nav-list {
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+        
+        .admin-nav-link {
+            flex: 1;
+            min-width: 100px;
+            justify-content: center;
+            padding: 0.5rem;
+        }
+        
+        .admin-nav-link span {
+            display: none;
+        }
+    }
+</style>
+
+<aside class="admin-sidebar">
+    <div class="admin-sidebar-header">
+        <h3>Admin Panel</h3>
+    </div>
+    
+    <nav>
+        <ul class="admin-nav-list">
             <li>
-                <a href="@Url.Action("Index", "Admin")" class="btn @(currentAction == "Index" && currentController == "Admin" ? "btn-primary" : "btn-outline")" style="width: 100%; justify-content: start; gap: 0.75rem; @(currentAction == "Index" && currentController == "Admin" ? "" : "border: none;")">
-                    <i class="ph-bold ph-squares-four"></i> Dashboard
+                <a href="@Url.Action("Index", "Admin")" class="admin-nav-link @(IsSidebarActive("Index") ? "active" : "")">
+                    <i class="ph-bold ph-squares-four"></i>
+                    <span>Dashboard</span>
                 </a>
             </li>
             <li>
-                <a href="@Url.Action("Products", "Admin")" class="btn @(currentAction == "Products" && currentController == "Admin" ? "btn-primary" : "btn-outline")" style="width: 100%; justify-content: start; gap: 0.75rem; @(currentAction == "Products" && currentController == "Admin" ? "" : "border: none;")">
-                    <i class="ph-bold ph-package"></i> Products
+                <a href="@Url.Action("Products", "Admin")" class="admin-nav-link @(IsSidebarActive("Products") ? "active" : "")">
+                    <i class="ph-bold ph-package"></i>
+                    <span>Products</span>
                 </a>
             </li>
             <li>
-                <a href="@Url.Action("Orders", "Admin")" class="btn @(currentAction == "Orders" && currentController == "Admin" ? "btn-primary" : "btn-outline")" style="width: 100%; justify-content: start; gap: 0.75rem; @(currentAction == "Orders" && currentController == "Admin" ? "" : "border: none;")">
-                    <i class="ph-bold ph-shopping-cart"></i> Orders
+                <a href="@Url.Action("Orders", "Admin")" class="admin-nav-link @(IsSidebarActive("Orders") ? "active" : "")">
+                    <i class="ph-bold ph-shopping-cart"></i>
+                    <span>Orders</span>
                 </a>
             </li>
             <li>
-                <a href="@Url.Action("Reports", "Admin")" class="btn @(currentAction == "Reports" && currentController == "Admin" ? "btn-primary" : "btn-outline")" style="width: 100%; justify-content: start; gap: 0.75rem; @(currentAction == "Reports" && currentController == "Admin" ? "" : "border: none;")">
-                    <i class="ph-bold ph-chart-line"></i> Reports
+                <a href="@Url.Action("Customers", "Admin")" class="admin-nav-link @(IsSidebarActive("Customers") ? "active" : "")">
+                    <i class="ph-bold ph-users"></i>
+                    <span>Customers</span>
                 </a>
             </li>
             <li>
-                <a href="@Url.Action("Customers", "Admin")" class="btn @((currentAction == "Customers" && currentController == "Admin") || (currentAction == "Index" && currentController == "Customer") ? "btn-primary" : "btn-outline")" style="width: 100%; justify-content: start; gap: 0.75rem; @((currentAction == "Customers" && currentController == "Admin") || (currentAction == "Index" && currentController == "Customer") ? "" : "border: none;")">
-                    <i class="ph-bold ph-users"></i> Customers
+                <a href="@Url.Action("Reports", "Admin")" class="admin-nav-link @(IsSidebarActive("Reports") ? "active" : "")">
+                    <i class="ph-bold ph-chart-line"></i>
+                    <span>Reports</span>
                 </a>
             </li>
         </ul>
-    </div>
+    </nav>
 </aside>
-

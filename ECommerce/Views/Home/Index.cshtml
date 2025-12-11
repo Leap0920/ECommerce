@@ -95,6 +95,157 @@
 <!-- Category Showcase -->
 <section class="section" style="padding-top: 4rem; padding-bottom: 4rem; background: #ffffff; position: relative; overflow: hidden;">
     
+    <style>
+        /* React-like Category Card Animations */
+        .category-card {
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(45, 106, 79, 0.2), 0 0 0 2px rgba(45, 106, 79, 0.1);
+        }
+        
+        .category-card:active {
+            transform: translateY(-6px) scale(0.98);
+            transition: all 0.1s ease;
+        }
+        
+        /* Icon container animation */
+        .category-card .category-icon {
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .category-card:hover .category-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 25px rgba(45, 106, 79, 0.4);
+        }
+        
+        /* Icon inner animation */
+        .category-card .category-icon i,
+        .category-card .category-icon svg {
+            transition: transform 0.3s ease;
+        }
+        
+        .category-card:hover .category-icon i,
+        .category-card:hover .category-icon svg {
+            transform: scale(1.15);
+        }
+        
+        /* Title animation */
+        .category-card h3 {
+            transition: all 0.3s ease;
+        }
+        
+        .category-card:hover h3 {
+            color: var(--primary);
+        }
+        
+        /* Shop Now arrow animation */
+        .category-card .shop-now-link {
+            transition: all 0.3s ease;
+        }
+        
+        .category-card .shop-now-link i {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .category-card:hover .shop-now-link {
+            gap: 0.75rem;
+        }
+        
+        .category-card:hover .shop-now-link i {
+            transform: translateX(6px);
+        }
+        
+        /* Top gradient bar animation */
+        .category-card .top-bar {
+            transition: height 0.3s ease, opacity 0.3s ease;
+        }
+        
+        .category-card:hover .top-bar {
+            height: 6px;
+        }
+        
+        /* Subtle background glow on hover */
+        .category-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(45, 106, 79, 0.03) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .category-card:hover::before {
+            opacity: 1;
+        }
+        
+        /* Ripple effect on click */
+        .category-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%), rgba(45, 106, 79, 0.15) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+        
+        .category-card.ripple::after {
+            opacity: 1;
+        }
+        
+        /* Feature Cards (Free Delivery, Secure Payment, 24/7 Support) */
+        .feature-card {
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: default;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(45, 106, 79, 0.15);
+        }
+        
+        .feature-card .feature-icon {
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 25px rgba(45, 106, 79, 0.4);
+        }
+        
+        .feature-card .feature-icon i {
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover .feature-icon i {
+            transform: scale(1.15);
+        }
+        
+        .feature-card .feature-bar {
+            transition: height 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover .feature-bar {
+            height: 6px;
+            box-shadow: 0 2px 10px rgba(45, 106, 79, 0.3);
+        }
+        
+        .feature-card h3 {
+            transition: color 0.3s ease;
+        }
+        
+        .feature-card:hover h3 {
+            color: var(--primary);
+        }
+    </style>
+    
     <div style="text-align: center; margin-bottom: 4rem; position: relative; z-index: 1;" data-aos="fade-up" data-aos-duration="400">
         <h1 style="font-size: 3rem; margin-bottom: 1rem; background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 700;">Shop by Category</h1>
         <p style="font-size: 1.2rem; color: var(--text-muted);">Discover our fresh selection of organic produce</p>
@@ -102,62 +253,62 @@
     
     <div class="category-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-bottom: 3rem; position: relative; z-index: 1;">
         <a href="#products" onclick="filterByType('leafy'); return false;" class="card category-card" style="padding: 2.5rem; text-align: center; text-decoration: none; cursor: pointer; background: #ffffff; border: 1px solid var(--border); position: relative; overflow: hidden;" data-aos="fade-up" data-aos-delay="0" data-aos-duration="400">
-            <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-primary);"></div>
-            <div style="width: 80px; height: 80px; background: var(--gradient-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; box-shadow: 0 4px 15px rgba(45, 106, 79, 0.3);">
+            <div class="top-bar" style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-primary);"></div>
+            <div class="category-icon" style="width: 80px; height: 80px; background: var(--gradient-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; box-shadow: 0 4px 15px rgba(45, 106, 79, 0.3); position: relative; z-index: 1;">
                 <i class="ph-fill ph-leaf" style="font-size: 2.5rem;"></i>
             </div>
-            <h3 style="margin-bottom: 0.5rem; color: var(--text-main); font-weight: 600;">Leafy Vegetables</h3>
-            <p style="color: var(--text-muted); margin-bottom: 1rem;">Fresh greens for your salads</p>
-            <span style="color: var(--primary); font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">Shop Now <i class="ph ph-arrow-right"></i></span>
+            <h3 style="margin-bottom: 0.5rem; color: var(--text-main); font-weight: 600; position: relative; z-index: 1;">Leafy Vegetables</h3>
+            <p style="color: var(--text-muted); margin-bottom: 1rem; position: relative; z-index: 1;">Fresh greens for your salads</p>
+            <span class="shop-now-link" style="color: var(--primary); font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; position: relative; z-index: 1;">Shop Now <i class="ph ph-arrow-right"></i></span>
         </a>
         
         <a href="#products" onclick="filterByType('root'); return false;" class="card category-card" style="padding: 2.5rem; text-align: center; text-decoration: none; cursor: pointer; background: #ffffff; border: 1px solid var(--border); position: relative; overflow: hidden;" data-aos="fade-up" data-aos-delay="50" data-aos-duration="400">
-            <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);"></div>
-            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);">
+            <div class="top-bar" style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);"></div>
+            <div class="category-icon" style="width: 80px; height: 80px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); position: relative; z-index: 1;">
                 <i class="ph-fill ph-carrot" style="font-size: 2.5rem;"></i>
             </div>
-            <h3 style="margin-bottom: 0.5rem; color: var(--text-main); font-weight: 600;">Root Vegetables</h3>
-            <p style="color: var(--text-muted); margin-bottom: 1rem;">Nutritious roots from the earth</p>
-            <span style="color: var(--primary); font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;">Shop Now <i class="ph ph-arrow-right"></i></span>
+            <h3 style="margin-bottom: 0.5rem; color: var(--text-main); font-weight: 600; position: relative; z-index: 1;">Root Vegetables</h3>
+            <p style="color: var(--text-muted); margin-bottom: 1rem; position: relative; z-index: 1;">Nutritious roots from the earth</p>
+            <span class="shop-now-link" style="color: var(--primary); font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; position: relative; z-index: 1;">Shop Now <i class="ph ph-arrow-right"></i></span>
         </a>
         
-        <a href="#products" onclick="filterByType('fruit'); return false;" class="card category-card" style="padding: 2.5rem; text-decoration: none; cursor: pointer; background: #ffffff; border: 1px solid var(--border); position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center;" data-aos="fade-up" data-aos-delay="100" data-aos-duration="400">
-            <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);"></div>
-            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);">
+        <a href="#products" onclick="filterByType('fruit'); return false;" class="card category-card" style="padding: 2.5rem; text-align: center; text-decoration: none; cursor: pointer; background: #ffffff; border: 1px solid var(--border); position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center;" data-aos="fade-up" data-aos-delay="100" data-aos-duration="400">
+            <div class="top-bar" style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);"></div>
+            <div class="category-icon" style="width: 80px; height: 80px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3); position: relative; z-index: 1;">
                 <svg width="40" height="40" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
                     <ellipse cx="12" cy="14" rx="7" ry="7" fill="white"/>
                     <path d="M12 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="white"/>
                     <path d="M11.5 2.5h1v3h-1z" fill="white"/>
                 </svg>
             </div>
-            <h3 style="margin-bottom: 0.5rem; color: var(--text-main); font-weight: 600; text-align: center;">Fruit Vegetables</h3>
-            <p style="color: var(--text-muted); margin-bottom: auto; text-align: center;">Sweet and colorful varieties</p>
-            <span style="color: var(--primary); font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1.5rem; align-self: flex-start;">Shop Now <i class="ph ph-arrow-right"></i></span>
+            <h3 style="margin-bottom: 0.5rem; color: var(--text-main); font-weight: 600; text-align: center; position: relative; z-index: 1;">Fruit Vegetables</h3>
+            <p style="color: var(--text-muted); margin-bottom: auto; text-align: center; position: relative; z-index: 1;">Sweet and colorful varieties</p>
+            <span class="shop-now-link" style="color: var(--primary); font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem; margin-top: 1.5rem; position: relative; z-index: 1;">Shop Now <i class="ph ph-arrow-right"></i></span>
         </a>
     </div>
 </section>
 
 <!-- Features Section -->
 <section class="section features-grid" style="padding: 4rem 0; background: #f8f9fa; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; position: relative;">
-    <div class="card" style="padding: 2.5rem; text-align: center; border: none; background: white; box-shadow: 0 4px 20px rgba(45, 106, 79, 0.1); position: relative; overflow: hidden;" data-aos="fade-up" data-aos-delay="0" data-aos-duration="400">
-        <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-primary);"></div>
-        <div style="width: 80px; height: 80px; background: var(--gradient-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; box-shadow: 0 4px 15px rgba(45, 106, 79, 0.3);">
+    <div class="card feature-card" style="padding: 2.5rem; text-align: center; border: none; background: white; box-shadow: 0 4px 20px rgba(45, 106, 79, 0.1); position: relative; overflow: hidden;" data-aos="fade-up" data-aos-delay="0" data-aos-duration="400">
+        <div class="feature-bar" style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-primary);"></div>
+        <div class="feature-icon" style="width: 80px; height: 80px; background: var(--gradient-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; box-shadow: 0 4px 15px rgba(45, 106, 79, 0.3);">
             <i class="ph-fill ph-truck" style="font-size: 2rem;"></i>
         </div>
         <h3 style="color: var(--text-main); font-weight: 600; margin-bottom: 0.5rem;">Free Delivery</h3>
         <p style="color: var(--text-muted);">Chat mo lang ako sa fb :D </p>
     </div>
-    <div class="card" style="padding: 2.5rem; text-align: center; border: none; background: white; box-shadow: 0 4px 20px rgba(45, 106, 79, 0.1); position: relative; overflow: hidden;" data-aos="fade-up" data-aos-delay="50" data-aos-duration="400">
-        <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-primary);"></div>
-        <div style="width: 80px; height: 80px; background: var(--gradient-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; box-shadow: 0 4px 15px rgba(45, 106, 79, 0.3);">
+    <div class="card feature-card" style="padding: 2.5rem; text-align: center; border: none; background: white; box-shadow: 0 4px 20px rgba(45, 106, 79, 0.1); position: relative; overflow: hidden;" data-aos="fade-up" data-aos-delay="50" data-aos-duration="400">
+        <div class="feature-bar" style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-primary);"></div>
+        <div class="feature-icon" style="width: 80px; height: 80px; background: var(--gradient-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; box-shadow: 0 4px 15px rgba(45, 106, 79, 0.3);">
             <i class="ph-fill ph-shield-check" style="font-size: 2rem;"></i>
         </div>
         <h3 style="color: var(--text-main); font-weight: 600; margin-bottom: 0.5rem;">Secure Payment</h3>
         <p style="color: var(--text-muted);">100% secure payment, rekta sa gcash ko.</p>
     </div>
-    <div class="card" style="padding: 2.5rem; text-align: center; border: none; background: white; box-shadow: 0 4px 20px rgba(45, 106, 79, 0.1); position: relative; overflow: hidden;" data-aos="fade-up" data-aos-delay="100" data-aos-duration="400">
-        <div style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-primary);"></div>
-        <div style="width: 80px; height: 80px; background: var(--gradient-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; box-shadow: 0 4px 15px rgba(45, 106, 79, 0.3);">
+    <div class="card feature-card" style="padding: 2.5rem; text-align: center; border: none; background: white; box-shadow: 0 4px 20px rgba(45, 106, 79, 0.1); position: relative; overflow: hidden;" data-aos="fade-up" data-aos-delay="100" data-aos-duration="400">
+        <div class="feature-bar" style="position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--gradient-primary);"></div>
+        <div class="feature-icon" style="width: 80px; height: 80px; background: var(--gradient-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; box-shadow: 0 4px 15px rgba(45, 106, 79, 0.3);">
             <i class="ph-fill ph-headset" style="font-size: 2rem;"></i>
         </div>
         <h3 style="color: var(--text-main); font-weight: 600; margin-bottom: 0.5rem;">24/7 Support</h3>

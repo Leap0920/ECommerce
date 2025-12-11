@@ -238,11 +238,15 @@ namespace ECommerce.Controllers.Api
                 var userId = GetCurrentUserId();
                 var sessionId = GetSessionId();
                 
-                // Get cart items - use user_id for logged-in users, session_id for guests
-                System.Diagnostics.Debug.WriteLine($"[Checkout] Getting cart items for UserId: {userId}, SessionId: {sessionId}");
-                var cartItems = userId.HasValue
-                    ? _cartRepository.GetByUserId(userId.Value)
-                    : _cartRepository.GetBySessionId(sessionId);
+                // Require user to be logged in for checkout
+                if (!userId.HasValue)
+                {
+                    return Json(new { success = false, message = "Please log in to complete your purchase", requiresAuth = true });
+                }
+                
+                // Get cart items for logged-in user
+                System.Diagnostics.Debug.WriteLine($"[Checkout] Getting cart items for UserId: {userId}");
+                var cartItems = _cartRepository.GetByUserId(userId.Value);
 
                 System.Diagnostics.Debug.WriteLine($"[Checkout] Found {cartItems.Count()} cart items");
                 foreach (var ci in cartItems)
@@ -309,15 +313,8 @@ namespace ECommerce.Controllers.Api
                     }
                 }
 
-                // Clear the cart after successful order - use user_id for logged-in users
-                if (userId.HasValue)
-                {
-                    _cartRepository.ClearCartByUserId(userId.Value);
-                }
-                else
-                {
-                    _cartRepository.ClearCart(sessionId);
-                }
+                // Clear the cart after successful order
+                _cartRepository.ClearCartByUserId(userId.Value);
 
                 return Json(new
                 {

@@ -30,12 +30,19 @@
                 <span>FreshMarket</span>
             </a>
 
-            <!-- Navigation Links -->
+            <!-- Navigation Links (hidden on admin pages) -->
+            @{
+                var layoutController = (ViewContext.RouteData.Values["controller"] ?? "").ToString();
+                var isAdminView = layoutController.Equals("Admin", StringComparison.OrdinalIgnoreCase) || Request.Url.AbsolutePath.ToLower().Contains("/admin");
+            }
+            @if (!isAdminView)
+            {
             <ul class="nav-links">
                 <li><a href="@Url.Action("Index", "Home")" class="nav-link vue-nav-link @(ViewBag.Title == "Home Page" ? "active" : "")" data-vue-btn="nav-home">Home</a></li>
                 <li><a href="@Url.Action("Index", "Home")#products" class="nav-link vue-nav-link" data-vue-btn="nav-shop">Shop</a></li>
                 <li><a href="@Url.Action("About", "Home")" class="nav-link vue-nav-link" data-vue-btn="nav-about">About</a></li>
             </ul>
+            }
 
             <!-- Actions -->
             <div class="nav-actions">
@@ -131,7 +138,7 @@
                 </div>
             </div>
             <div style="border-top: 1px solid var(--border); padding-top: 2rem; text-align: center;" data-aos="fade-up">
-                <p style="font-size: 0.875rem; color: var(--text-muted);">&copy; 2023 FreshMarket. All rights reserved.</p>
+                <p style="font-size: 0.875rem; color: var(--text-muted);">&copy; 2025 SBIT-3C. All rights reserved.</p>
             </div>
         </div>
     </footer>

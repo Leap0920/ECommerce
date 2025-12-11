@@ -2,7 +2,23 @@
     ViewBag.Title = "Manage Products";
 }
 
-<div style="display: flex; gap: 2rem;">
+<style>
+    .admin-layout {
+        display: flex;
+        gap: 2rem;
+        padding-top: 1.5rem;
+    }
+    
+    @@media (max-width: 768px) {
+        .admin-layout {
+            flex-direction: column;
+            gap: 1rem;
+            padding-top: 1rem;
+        }
+    }
+</style>
+
+<div class="admin-layout">
     <!-- Sidebar -->
     @Html.Partial("_AdminSidebar")
 
